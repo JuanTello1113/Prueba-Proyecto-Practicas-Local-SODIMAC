@@ -414,7 +414,7 @@ export class ArchivoAdjuntoController {
         idUsuario: req.user.id_usuario,
         descripcion: mensaje,
         idEstado: 1,
-        idTipoNovedad, // Ahora garantizado que NO es null
+        idTipoNovedad, 
         esMasiva: false,
         cantidadSolicitudes: 1,
       });
