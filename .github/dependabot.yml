@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Maintain Frontend dependencies
+  - package-ecosystem: "npm"
+    directory: "/Frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "frontend"
+      - "dependencies"
+
+  # Maintain Backend dependencies
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "backend"
+      - "dependencies"
