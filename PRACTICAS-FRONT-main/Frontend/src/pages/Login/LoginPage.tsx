@@ -14,14 +14,18 @@ const LoginPage: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleLogin = async (email: string, idToken: string) => {
-    console.log('✅ Login Exitoso con Google:', email);
+    if (import.meta.env.DEV) {
+      console.log('✅ Login Exitoso con Google:', email);
+    }
 
     try {
       const userData = await loginWithGoogle(idToken);
 
       setUser(userData.user); //Se guarda usuario en el contexto
-      console.log('Nombre que recibe frontend:', userData.user.nombre);
-      console.log('🎉 Usuario autenticado desde el backend:', userData.user);
+      if (import.meta.env.DEV) {
+        console.log('Nombre que recibe frontend:', userData.user.nombre);
+        console.log('🎉 Usuario autenticado desde el backend:', userData.user);
+      }
 
       //Ruta a seguir segun rol del usuario
       if (userData.user.esAdmin) {
@@ -89,7 +93,7 @@ const LoginPage: React.FC = () => {
               ¿Tienes dudas del portal? <br />
               <span
                 className="font-normal cursor-pointer hover:underline hover:text-yellow-200 transition duration-200"
-                onClick={() => console.log('Redirigir a preguntas frecuentes')}
+                onClick={() => {/* Navigate to FAQ */ }}
               >
                 Resuélvelas aquí
               </span>
@@ -98,7 +102,7 @@ const LoginPage: React.FC = () => {
               ¿No logras ingresar? <br />
               <span
                 className="font-normal cursor-pointer hover:underline hover:text-yellow-200 transition duration-200"
-                onClick={() => console.log('Redirigir a soporte')}
+                onClick={() => {/* Navigate to support */ }}
               >
                 Crear caso con soporte SODI
               </span>

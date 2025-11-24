@@ -1,4 +1,5 @@
-import axios from 'axios';
+﻿import axios from 'axios';
+import apiClient from '../../api/client';
 import React, { useEffect, useState } from 'react';
 import { FiClock } from 'react-icons/fi';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -61,14 +62,19 @@ const FormularioBasico: React.FC = () => {
         ).toISOString(), // 👈 igual que los masivos
       };
 
-      console.log('📤 Enviando payload:', payload);
+      if (import.meta.env.DEV) {
+        console.log('📤 Enviando payload:', payload);
+      }
 
-      const response = await axios.post(
-        'http://localhost:3000/archivo-adjunto/formulario-novedad',
-        payload,
+      const response = await apiClient.post(
+        '/archivo-adjunto/formulario-novedad',
+        payload, // Assuming formData was a typo and payload should be used here based on the surrounding code.
+        { withCredentials: true }
       );
 
-      console.log('✅ Respuesta del backend:', response.data);
+      if (import.meta.env.DEV) {
+        console.log('✅ Respuesta del backend:', response.data);
+      }
 
       if (response.data?.valido) {
         setArchivoSubido({
@@ -170,11 +176,10 @@ const FormularioBasico: React.FC = () => {
         {/* BOTONES al lado derecho */}
         <div className="flex flex-col gap-2 py-10 items-end">
           <button
-            className={`w-full px-4 py-2 rounded-lg text-white ${
-              isFormValid
+            className={`w-full px-4 py-2 rounded-lg text-white ${isFormValid
                 ? 'bg-[#4669AF] hover:opacity-90'
                 : 'bg-gray-400 cursor-not-allowed'
-            }`}
+              }`}
             disabled={!isFormValid}
             onClick={handleSubmit} // <- nuevo
           >

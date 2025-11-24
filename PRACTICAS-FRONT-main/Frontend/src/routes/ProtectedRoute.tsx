@@ -15,15 +15,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
     return <Navigate to="/" replace />;
   }
 
-  console.log("🔍 Usuario recibido en ProtectedRoute:", user);
+  if (import.meta.env.DEV) {
+    console.log('🔍 Usuario recibido en ProtectedRoute:', user);
+  }
 
   let userRole = "";
   if (user.esAdmin) userRole = "admin";
   else if (user.esNomina) userRole = "nomina";
   else if (user.esJefe) userRole = "jefe";
 
-  console.log("Rol normalizado del usuario:", userRole);
-  console.log("Roles permitidos:", allowedRoles);
+  if (import.meta.env.DEV) {
+    console.log('Rol normalizado del usuario:', userRole);
+    console.log('Roles permitidos:', allowedRoles);
+  }
 
   if (!allowedRoles.includes(userRole)) {
     return <Navigate to="/unauthorized" replace />;

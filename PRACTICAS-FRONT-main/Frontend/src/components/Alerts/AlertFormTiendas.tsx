@@ -1,5 +1,5 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import apiClient from '../../api/client';
 import { FiMapPin } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +22,7 @@ const FormElegirTienda: React.FC<FormElegirTiendaProps> = ({
   useEffect(() => {
     const fetchTiendas = async () => {
       try {
-        const res = await axios.get<Tienda[]>('http://localhost:3000/tiendas', {
+        const res = await apiClient.get<Tienda[]>('/tiendas', {
           withCredentials: true,
         });
         setTiendas(res.data);
@@ -69,18 +69,16 @@ const FormElegirTienda: React.FC<FormElegirTiendaProps> = ({
   return (
     <div
       role="dialog"
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-500 ${
-        closing
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-500 ${closing
           ? 'opacity-0 pointer-events-none'
           : 'opacity-100 backdrop-blur-sm'
-      }`}
+        }`}
     >
       <div
-        className={`relative bg-white text-[#4669AF] px-8 py-6 rounded-3xl shadow-2xl border-4 border-[#4669AF] max-w-md w-full mx-4 flex flex-col items-center gap-4 transform transition-all duration-500 ${
-          closing
+        className={`relative bg-white text-[#4669AF] px-8 py-6 rounded-3xl shadow-2xl border-4 border-[#4669AF] max-w-md w-full mx-4 flex flex-col items-center gap-4 transform transition-all duration-500 ${closing
             ? '-translate-y-20 opacity-0 scale-95'
             : 'translate-y-0 opacity-100 scale-100 animate-slideUp'
-        }`}
+          }`}
       >
         {/* Botón cerrar */}
         <button

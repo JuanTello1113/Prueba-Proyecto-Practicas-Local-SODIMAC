@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { Ban, Edit, Search, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
+import apiClient from '../../api/client';
 
 interface UsuarioGestion {
   id_usuario: number;
@@ -41,8 +41,8 @@ const GestionUser: React.FC = () => {
     const fetchUsuarios = async () => {
       try {
         const [resUsuarios, resDatos] = await Promise.all([
-          axios.get('http://localhost:3000/usuario/listar'),
-          axios.get('http://localhost:3000/usuario'), // Endpoint para roles y tiendas
+          apiClient.get('/usuario/listar'),
+          apiClient.get('/usuario'), // Endpoint para roles y tiendas
         ]);
         setUsuarios(resUsuarios.data);
         setRoles(resDatos.data.roles);
@@ -98,9 +98,9 @@ const GestionUser: React.FC = () => {
   };
 
   const handleEliminar = async (id: number, nombre: string) => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario "${nombre}"? Esta acción no se puede deshacer.`)) {
+    if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario "${nombre}" ? Esta acción no se puede deshacer.`)) {
       try {
-        await axios.delete(`http://localhost:3000/usuario/${id}/eliminar`);
+        await apiClient.delete(`/usuario/${id}/eliminar`);
         setUsuarios(usuarios.filter((u) => u.id_usuario !== id));
         alert('✅ Usuario eliminado correctamente');
       } catch (error) {
@@ -113,7 +113,7 @@ const GestionUser: React.FC = () => {
   const handleDesactivar = async (id: number, nombre: string) => {
     if (window.confirm(`¿Estás seguro de que deseas desactivar al usuario "${nombre}"?`)) {
       try {
-        await axios.patch(`http://localhost:3000/usuario/${id}/desactivar`);
+        await apiClient.patch(`/usuario/${id}/desactivar`);
         setUsuarios(
           usuarios.map((u) =>
             u.id_usuario === id ? { ...u, estado: 'Inactivo' } : u,
@@ -145,8 +145,8 @@ const GestionUser: React.FC = () => {
     if (!editingUser || !selectedRole) return;
 
     try {
-      await axios.put(
-        `http://localhost:3000/usuario/${editingUser.id_usuario}/editar`,
+      await apiClient.put(
+        `/usuario/${editingUser.id_usuario}/editar`,
         {
           nuevoRolId: selectedRole,
           idTienda: selectedStore,

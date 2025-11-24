@@ -28,7 +28,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Función para mostrar splash
   const showSplash = useCallback((reason: string) => {
-    console.log('Mostrando splash por:', reason);
+    if (import.meta.env.DEV) {
+      console.log('Mostrando splash por:', reason);
+    }
     setSplashVisible(true);
 
     const timeout = setTimeout(() => {

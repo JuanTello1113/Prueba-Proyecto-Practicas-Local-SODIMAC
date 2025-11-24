@@ -1,4 +1,5 @@
-import axios from 'axios';
+﻿import axios from 'axios';
+import apiClient from '../../api/client';
 import { Download, Upload } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import AlertFiltros from '../Alerts/AlertFiltros';
