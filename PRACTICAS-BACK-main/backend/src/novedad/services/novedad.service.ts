@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { getMensajePorEstadoBackendPorId } from 'src/utils/getMensajePorEstado';
 import { NotificacionService } from '../../notificacion/services/notificacion.service';
 import { CorreoLogService } from '../../correo_log/services/correo_log.service';

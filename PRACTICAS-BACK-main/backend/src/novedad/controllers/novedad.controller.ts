@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { getMensajePorEstadoBackendPorId } from 'src/utils/getMensajePorEstado';
 import { NovedadeService } from '../services/novedad.service';
 

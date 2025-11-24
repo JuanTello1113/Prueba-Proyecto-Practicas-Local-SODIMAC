@@ -6,7 +6,7 @@ import * as FormData from 'form-data';
 import * as fsSync from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 interface Solicitud {
   fecha: Date | string;

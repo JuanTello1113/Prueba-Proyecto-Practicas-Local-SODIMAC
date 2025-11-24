@@ -8,8 +8,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { PrismaService } from 'prisma/prisma.service';
-import { UsuarioService } from 'src/usuario/services/usuario.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { UsuarioService } from '../usuario/services/usuario.service';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
@@ -35,7 +35,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usuarioService: UsuarioService,
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   // Login con Google
   @Post('google')

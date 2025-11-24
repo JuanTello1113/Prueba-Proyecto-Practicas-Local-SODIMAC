@@ -17,7 +17,11 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "types": ["node", "express"],
+    "types": [
+      "node",
+      "express",
+      "jest"
+    ],
     "noFallthroughCasesInSwitch": false
   }
 }
