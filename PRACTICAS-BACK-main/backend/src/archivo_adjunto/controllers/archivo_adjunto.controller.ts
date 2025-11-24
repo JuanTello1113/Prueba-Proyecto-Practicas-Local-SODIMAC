@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   Req,
@@ -414,7 +415,7 @@ export class ArchivoAdjuntoController {
         idUsuario: req.user.id_usuario,
         descripcion: mensaje,
         idEstado: 1,
-        idTipoNovedad, 
+        idTipoNovedad,
         esMasiva: false,
         cantidadSolicitudes: 1,
       });
@@ -636,6 +637,48 @@ export class ArchivoAdjuntoController {
   @Post('cargar-respuesta-masiva')
   @UseInterceptors(FileInterceptor('file'))
   async cargarRespuestaMasiva(@UploadedFile() file: Express.Multer.File) {
-    return this.archivoAdjuntoService.procesarArchivoRespuestas(file.buffer);
+    return this.archivoAdjuntoService.procesarArchivoRespuestas(
+      file.buffer,
+      file.originalname,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('descargar-archivo/:id')
+  async descargarArchivo(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const archivo = await this.archivoAdjuntoService.obtenerArchivoPorId(
+        parseInt(id),
+      );
+
+      if (!archivo) {
+        return res.status(404).json({ message: 'Archivo no encontrado' });
+      }
+
+      if (!archivo.ruta_archivo) {
+        return res.status(404).json({ message: 'Ruta de archivo no disponible' });
+      }
+
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${archivo.nombre_archivo}"`,
+      );
+      res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+
+      res.sendFile(archivo.ruta_archivo);
+    } catch (error) {
+      console.error('❌ Error al descargar archivo:', error);
+      return res.status(500).json({
+        message: 'Error al descargar el archivo',
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 }

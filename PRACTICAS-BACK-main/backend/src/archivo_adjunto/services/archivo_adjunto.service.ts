@@ -10,7 +10,7 @@ import { PrismaService } from 'prisma/prisma.service';
 
 interface Solicitud {
   fecha: Date | string;
-  cedula: number;
+  cedula: number | bigint;
   nombre: string;
   categoria: string;
   tienda: string;
@@ -62,7 +62,7 @@ interface FilaParaExportar {
   id: number;
   numero: number;
   fecha: string;
-  cedula: number;
+  cedula: number | bigint;
   nombre: string;
   categoria: string;
   tienda: string;
@@ -92,7 +92,7 @@ interface FilaParaExportar {
 
 interface CrearNovedadIndividual {
   //BASICOS
-  cedula: number;
+  cedula: number | bigint;
   nombre: string;
   detalle: string;
   titulo: string;
@@ -126,7 +126,7 @@ interface CrearNovedadIndividual {
 
 @Injectable()
 export class ArchivoAdjuntoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   private obtenerArchivoPorSolicitud(titulo: string): string {
     const archivos: Record<string, string> = {
@@ -173,7 +173,7 @@ export class ArchivoAdjuntoService {
 
       const fileBuffer = await fs.readFile(plantillaPath);
       const workbook = new Workbook();
-      await workbook.xlsx.load(fileBuffer);
+      await workbook.xlsx.load(fileBuffer as any);
       const worksheet = workbook.getWorksheet(1);
 
       if (!worksheet) {
@@ -374,7 +374,7 @@ export class ArchivoAdjuntoService {
   ): Promise<void> {
     try {
       const workbook = new Workbook();
-      await workbook.xlsx.load(buffer);
+      await workbook.xlsx.load(buffer as any);
       console.log('✅ Archivo Excel cargado correctamente');
 
       const sheet = workbook.getWorksheet(1);
@@ -817,7 +817,7 @@ export class ArchivoAdjuntoService {
       const buf = await fs.readFile(plantillaPath);
 
       const workbook = new Workbook();
-      await workbook.xlsx.load(buf);
+      await workbook.xlsx.load(buf as any);
       const sheet = workbook.getWorksheet(1);
 
       if (!sheet) {
@@ -850,7 +850,7 @@ export class ArchivoAdjuntoService {
         }
 
         // D en adelante
-        row.getCell('D').value = orig.cedula;
+        row.getCell('D').value = Number(orig.cedula);
         row.getCell('E').value = orig.nombre;
         row.getCell('F').value = orig.categoria;
         row.getCell('G').value = orig.tienda;
@@ -1031,7 +1031,7 @@ export class ArchivoAdjuntoService {
 
     const buf = await fs.readFile(plantillaPath);
     const workbook = new Workbook();
-    await workbook.xlsx.load(buf);
+    await workbook.xlsx.load(buf as any);
     const sheet = workbook.getWorksheet(1);
 
     if (!sheet) {
@@ -1047,7 +1047,7 @@ export class ArchivoAdjuntoService {
       row.getCell('A').value = fila.id;
       row.getCell('B').value = fila.numero;
       row.getCell('C').value = fila.fecha;
-      row.getCell('D').value = fila.cedula;
+      row.getCell('D').value = Number(fila.cedula);
       row.getCell('E').value = fila.nombre;
       row.getCell('F').value = fila.categoria;
       row.getCell('G').value = fila.tienda;
@@ -1081,11 +1081,63 @@ export class ArchivoAdjuntoService {
     return Buffer.from(finalBuffer);
   }
 
+  /**
+   * Guarda un archivo físicamente en el servidor y crea un registro en archivo_adjunto
+   */
+  async guardarArchivoFisico(
+    buffer: Buffer,
+    nombreOriginal: string,
+    idNovedad: number,
+  ): Promise<void> {
+    try {
+      // Crear directorio uploads si no existe
+      const uploadsDir = path.resolve(process.cwd(), 'uploads');
+
+      if (!fsSync.existsSync(uploadsDir)) {
+        await fs.mkdir(uploadsDir, { recursive: true });
+      }
+
+      // Generar nombre único para el archivo
+      const timestamp = Date.now();
+      const ext = path.extname(nombreOriginal);
+      const nombreArchivo = `respuesta_${idNovedad}_${timestamp}${ext}`;
+      const rutaCompleta = path.join(uploadsDir, nombreArchivo);
+
+      // Guardar archivo físicamente
+      await fs.writeFile(rutaCompleta, buffer);
+      console.log(`✅ Archivo guardado en: ${rutaCompleta}`);
+
+      // Crear registro en la base de datos
+      await this.prisma.archivo_adjunto.create({
+        data: {
+          id_novedad: idNovedad,
+          nombre_archivo: nombreOriginal,
+          ruta_archivo: rutaCompleta,
+        },
+      });
+
+      console.log(`✅ Registro creado en archivo_adjunto para novedad ${idNovedad}`);
+    } catch (error) {
+      console.error('❌ Error al guardar archivo:', error);
+      throw new Error('No se pudo guardar el archivo de respuestas');
+    }
+  }
+
+  /**
+   * Obtiene información de un archivo guardado por su ID
+   */
+  async obtenerArchivoPorId(idArchivo: number) {
+    return await this.prisma.archivo_adjunto.findUnique({
+      where: { id_archivo: idArchivo },
+    });
+  }
+
   async procesarArchivoRespuestas(
     fileBuffer: Buffer,
+    nombreArchivo?: string,
   ): Promise<{ actualizados: number }> {
     const workbook = new Workbook();
-    await workbook.xlsx.load(fileBuffer);
+    await workbook.xlsx.load(fileBuffer as any);
     const sheet = workbook.getWorksheet(1);
 
     if (!sheet) {
@@ -1177,6 +1229,68 @@ export class ArchivoAdjuntoService {
       }
     }
 
+    // Guardar el archivo físicamente SIEMPRE si se proporcionó un nombre
+    if (nombreArchivo) {
+      let idNovedad: number | null = null;
+
+      // Intentar obtener el primer ID de novedad del archivo
+      if (idsActualizados.size > 0) {
+        idNovedad = Array.from(idsActualizados)[0];
+        console.log(`✅ Usando id_novedad ${idNovedad} de los registros actualizados`);
+      } else {
+        // Si no se actualizó nada, intentar leer el primer ID del Excel
+        console.warn('⚠️ No se actualizó ningún registro. Intentando extraer ID del Excel...');
+
+        for (let rowIndex = 7; rowIndex <= sheet.rowCount; rowIndex++) {
+          const row = sheet.getRow(rowIndex);
+          const idFromExcel = row.getCell('A').value as number;
+
+          if (idFromExcel && typeof idFromExcel === 'number') {
+            // Verificar que este ID existe en la BD
+            const novedadExiste = await this.prisma.novedad.findUnique({
+              where: { id_novedad: idFromExcel },
+            });
+
+            if (novedadExiste) {
+              idNovedad = idFromExcel;
+              console.log(`📋 Encontrado id_novedad ${idNovedad} en fila ${rowIndex} del Excel y verificado en BD`);
+              break;
+            } else {
+              console.warn(`⚠️ id_novedad ${idFromExcel} en fila ${rowIndex} NO existe en la BD, continuando...`);
+            }
+          }
+        }
+
+        // Si aún así no hay ID, usar la novedad masiva más reciente en estado 2
+        if (!idNovedad) {
+          console.warn('⚠️ No se encontró ID en el Excel. Buscando novedad más reciente...');
+          const novedadReciente = await this.prisma.novedad.findFirst({
+            where: {
+              es_masiva: true,
+              id_estado_novedad: 2,
+            },
+            orderBy: { id_novedad: 'desc' },
+          });
+
+          if (novedadReciente) {
+            idNovedad = novedadReciente.id_novedad;
+            console.log(`🔍 Usando novedad más reciente: ${idNovedad}`);
+          }
+        }
+      }
+
+      if (idNovedad) {
+        await this.guardarArchivoFisico(fileBuffer, nombreArchivo, idNovedad);
+        console.log(`💾 Archivo guardado correctamente para novedad ${idNovedad}`);
+      } else {
+        console.error('❌ No se pudo determinar un id_novedad para guardar el archivo');
+        throw new Error('No se pudo asociar el archivo a ninguna novedad');
+      }
+    } else {
+      console.warn('⚠️ No se proporcionó nombre de archivo, no se guardará');
+    }
+
+    console.log(`📊 Resumen: ${actualizados} registros actualizados de ${sheet.rowCount - 6} filas procesadas`);
     return { actualizados };
   }
 }

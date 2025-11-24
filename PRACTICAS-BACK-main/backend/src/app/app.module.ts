@@ -8,6 +8,8 @@ import { RolModule } from 'src/rol/rol.module';
 import { TiendaModule } from 'src/tienda/tienda.module';
 import { UsuarioModule } from 'src/usuario/usuario.module';
 import { AuthModule } from '../auth/auth.module'; // importa el módulo de auth
+import { NotificacionModule } from '../notificacion/notificacion.module';
+import { CorreoLogModule } from '../correo_log/correo_log.module';
 import { AppController } from './controllers/app.controller';
 
 @Module({
@@ -20,7 +22,10 @@ import { AppController } from './controllers/app.controller';
     TiendaModule,
     UsuarioModule,
     RolModule,
+    NotificacionModule,
+    NotificacionModule,
+    CorreoLogModule,
   ],
   controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule { }

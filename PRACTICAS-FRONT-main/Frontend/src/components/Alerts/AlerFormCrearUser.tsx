@@ -19,7 +19,7 @@ interface FormCrearUsuarioProps {
     correo: string;
     rol: string;
     esJefe: boolean;
-    tienda?: number;
+    tienda?: string;
   }) => void;
 }
 
@@ -37,13 +37,16 @@ const FormCrearUsuario: React.FC<FormCrearUsuarioProps> = ({
 
   // Marcar automáticamente si el rol es jefe
   useEffect(() => {
-    setEsJefe(rol === 'Jefe de Tienda');
+    if (rol) {
+      const r = rol.toLowerCase();
+      setEsJefe(r === 'jefe de tienda' || r === 'jefe');
+    }
   }, [rol]);
 
   useEffect(() => {
     const fetchTiendas = async () => {
       try {
-        const res = await axios.get<Tienda[]>('http://localhost:3000/tiendas', {
+        const res = await axios.get<Tienda[]>('/tiendas', {
           withCredentials: true,
         });
         setTiendas(res.data);
@@ -58,7 +61,7 @@ const FormCrearUsuario: React.FC<FormCrearUsuarioProps> = ({
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const res = await axios.get<Rol[]>('http://localhost:3000/roles', {
+        const res = await axios.get<Rol[]>('/roles', {
           withCredentials: true,
         });
         setRoles(res.data);
@@ -76,12 +79,23 @@ const FormCrearUsuario: React.FC<FormCrearUsuarioProps> = ({
       return;
     }
 
+    if (esJefe && !tienda) {
+      alert('Debe asignar una tienda si el usuario es Jefe de Tienda.');
+      return;
+    }
+
+    let nombreTienda: string | undefined = undefined;
+    if (esJefe && tienda !== '') {
+      const tiendaObj = tiendas.find((t) => t.id_tienda === Number(tienda));
+      nombreTienda = tiendaObj?.nombre_tienda;
+    }
+
     onCrear({
       nombre,
       correo,
       rol,
       esJefe,
-      tienda: esJefe && tienda !== '' ? Number(tienda) : undefined,
+      tienda: nombreTienda,
     });
   };
 
@@ -170,7 +184,7 @@ const FormCrearUsuario: React.FC<FormCrearUsuarioProps> = ({
                     type="radio"
                     name="esJefe"
                     checked={esJefe}
-                    readOnly
+                    onChange={() => setEsJefe(true)}
                     className="mr-2 text-indigo-600"
                   />
                   <span className="text-sm">Sí</span>
@@ -180,7 +194,7 @@ const FormCrearUsuario: React.FC<FormCrearUsuarioProps> = ({
                     type="radio"
                     name="esJefe"
                     checked={!esJefe}
-                    readOnly
+                    onChange={() => setEsJefe(false)}
                     className="mr-2 text-indigo-600"
                   />
                   <span className="text-sm">No</span>
@@ -197,13 +211,12 @@ const FormCrearUsuario: React.FC<FormCrearUsuarioProps> = ({
                 value={tienda}
                 onChange={(e) => setTienda(Number(e.target.value))}
                 disabled={!esJefe}
-                className={`w-full px-3 py-2 rounded-md text-sm transition-all duration-200 ${
-                  esJefe
-                    ? 'border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#4669AF]'
-                    : 'border border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed'
-                }`}
+                className={`w-full px-3 py-2 rounded-md text-sm transition-all duration-200 ${esJefe
+                  ? 'border border-gray-300 bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#4669AF]'
+                  : 'border border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed'
+                  }`}
               >
-                <option value="">Todas las Tiendas</option>
+                <option value="">Seleccione una tienda</option>
                 {tiendas.map((t) => (
                   <option key={t.id_tienda} value={t.id_tienda}>
                     {t.nombre_tienda}

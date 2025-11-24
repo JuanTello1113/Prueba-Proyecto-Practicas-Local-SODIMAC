@@ -133,7 +133,7 @@ model DetalleNovedadMasiva {
   id_novedad               Int
   n                        Int?
   fecha                    DateTime? @db.Timestamp(6)
-  cedula                   Int?
+  cedula                   BigInt?
   nombre                   String?   @db.VarChar
   categoria                String?   @db.VarChar
   tienda                   String?   @db.VarChar

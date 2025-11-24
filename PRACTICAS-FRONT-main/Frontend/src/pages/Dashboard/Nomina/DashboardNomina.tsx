@@ -111,9 +111,39 @@ const DashboardNomina: React.FC = () => {
       {mostrarAccionMasiva && (
         <FormAccionMasiva
           onClose={() => setMostrarAccionMasiva(false)}
-          onArchivoSeleccionado={(file) => {
+          onArchivoSeleccionado={async (file) => {
             console.log('📁 Archivo cargado:', file);
-            // Aquí puedes manejar la lógica de carga, por ahora solo lo mostramos
+
+            try {
+              const formData = new FormData();
+              formData.append('file', file);
+
+              const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+              const response = await fetch(
+                `${apiUrl}/archivo-adjunto/cargar-respuesta-masiva`,
+                {
+                  method: 'POST',
+                  body: formData,
+                  credentials: 'include',
+                },
+              );
+
+              const data = await response.json();
+
+              if (response.ok) {
+                alert(
+                  `✅ Archivo procesado correctamente.\nActualizados: ${data.actualizados}`,
+                );
+                setMostrarAccionMasiva(false);
+              } else {
+                throw new Error(data.message || 'Error al procesar el archivo');
+              }
+            } catch (error) {
+              console.error('❌ Error al cargar el archivo:', error);
+              alert(
+                `Ocurrió un error al cargar el archivo de respuestas.\n${error instanceof Error ? error.message : 'Error desconocido'}`,
+              );
+            }
           }}
           onSeleccionarDescargar={() => {
             navigate('/respuesta-masiva'); // Aquí decides tú a dónde mandar

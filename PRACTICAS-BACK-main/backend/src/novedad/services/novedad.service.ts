@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { getMensajePorEstadoBackendPorId } from 'src/utils/getMensajePorEstado';
+import { NotificacionService } from '../../notificacion/services/notificacion.service';
+import { CorreoLogService } from '../../correo_log/services/correo_log.service';
 
 interface FiltrosTienda {
   tipo?: string;
@@ -77,7 +79,11 @@ interface DetalleIndividual {
 
 @Injectable()
 export class NovedadeService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    private notificacionService: NotificacionService,
+    private correoLogService: CorreoLogService,
+  ) { }
 
   async crearNovedad(params: {
     idUsuario: number;
@@ -131,6 +137,28 @@ export class NovedadeService {
     });
 
     console.log(`✅ Historial creado para novedad ${novedad.id_novedad}`);
+
+    console.log(`✅ Historial creado para novedad ${novedad.id_novedad}`);
+
+    // 🔔 Crear Notificación
+    await this.notificacionService.crearNotificacion({
+      id_usuario: idUsuario,
+      id_novedad: novedad.id_novedad,
+      mensaje: `Nueva novedad creada: ${descripcion}`,
+    });
+
+    // 📧 Enviar Correo (Simulado)
+    const usuario = await this.prisma.usuario.findUnique({
+      where: { id_usuario: idUsuario },
+    });
+    if (usuario?.correo) {
+      await this.correoLogService.enviarCorreo(
+        usuario.correo,
+        'Novedad Creada',
+        `Se ha creado la novedad: ${descripcion}`,
+        undefined, // idNotificacion opcional
+      );
+    }
 
     return novedad;
   }
@@ -442,7 +470,10 @@ export class NovedadeService {
       resultados.length,
     );
 
-    return resultados;
+    return resultados.map((item) => ({
+      ...item,
+      cedula: item.cedula?.toString() ?? null,
+    }));
   }
 
   async obtenerDetalleIndividual(
@@ -758,7 +789,7 @@ export class NovedadeService {
       whereCondition.cedula = filtros.cedula;
     }
 
-    return this.prisma.detalleNovedadMasiva.findMany({
+    const resultados = await this.prisma.detalleNovedadMasiva.findMany({
       where: whereCondition,
       orderBy: { id_novedad: 'asc' },
       select: {
@@ -793,6 +824,11 @@ export class NovedadeService {
         categoria_inconsistencia: true,
       },
     });
+
+    return resultados.map((item) => ({
+      ...item,
+      cedula: item.cedula?.toString() ?? null,
+    }));
   }
 
   async cambiarEstadoNovedad(
@@ -826,6 +862,29 @@ export class NovedadeService {
           }`,
       },
     });
+
+    // 🔔 Crear Notificación
+    await this.notificacionService.crearNotificacion({
+      id_usuario: idUsuario, // Notificar al que hizo el cambio (o al dueño de la novedad, lógica a definir)
+      id_novedad: idNovedad,
+      mensaje: `Estado de novedad actualizado a: ${estadoStr}`,
+    });
+
+    // 📧 Enviar Correo (Simulado)
+    // Buscar usuario dueño de la novedad para notificarle
+    const novedad = await this.prisma.novedad.findUnique({
+      where: { id_novedad: idNovedad },
+      include: { usuario: true },
+    });
+
+    if (novedad?.usuario?.correo) {
+      await this.correoLogService.enviarCorreo(
+        novedad.usuario.correo,
+        `Actualización de Novedad #${idNovedad}`,
+        `El estado ha cambiado a: ${estadoStr}. Comentario: ${descripcion}`,
+        undefined,
+      );
+    }
 
     return { success: true, message: 'Estado actualizado correctamente' };
   }
@@ -881,13 +940,8 @@ export class NovedadeService {
   async obtenerDetallesPendientesParaNomina(filtros: FiltrosParaNomina = {}) {
     const whereCondition: Record<string, any> = {
       novedad: {
-        is: {
-          estado_novedad: {
-            nombre_estado: {
-              equals: 'CREADA', // o 'PENDIENTE' si así está en la BD
-              mode: 'insensitive',
-            },
-          },
+        id_estado_novedad: {
+          in: [1, 2], // 1: CREADA, 2: EN GESTIÓN
         },
       },
     };
@@ -942,7 +996,7 @@ export class NovedadeService {
       }
     }
 
-    return this.prisma.detalleNovedadMasiva.findMany({
+    const resultados = await this.prisma.detalleNovedadMasiva.findMany({
       where: whereCondition,
       orderBy: { id_novedad: 'asc' },
       select: {
@@ -977,6 +1031,11 @@ export class NovedadeService {
         categoria_inconsistencia: true,
       },
     });
+
+    return resultados.map((item) => ({
+      ...item,
+      cedula: item.cedula?.toString() ?? null,
+    }));
   }
 
   async cambiarMultiplesEstados(
@@ -1017,6 +1076,28 @@ export class NovedadeService {
           comentario: `Estado cambiado a "${estadoStr}" por ${esTienda ? 'TIENDA' : 'NÓMINA'}`,
         },
       });
+
+      // 🔔 Crear Notificación
+      await this.notificacionService.crearNotificacion({
+        id_usuario: idUsuario,
+        id_novedad: id,
+        mensaje: `Estado de novedad masiva actualizado a: ${estadoStr}`,
+      });
+
+      // 📧 Enviar Correo (Simulado)
+      const novedad = await this.prisma.novedad.findUnique({
+        where: { id_novedad: id },
+        include: { usuario: true },
+      });
+
+      if (novedad?.usuario?.correo) {
+        await this.correoLogService.enviarCorreo(
+          novedad.usuario.correo,
+          `Actualización de Novedad #${id}`,
+          `El estado ha cambiado a: ${estadoStr}.`,
+          undefined,
+        );
+      }
     }
 
     return {

@@ -5,26 +5,48 @@ import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 
 interface Usuario {
+  id_usuario: number;
   nombre: string;
   correo: string;
   rol: string;
   estado: 'Activo' | 'Inactivo';
   fecha_creacion: string;
+  tienda?: string | null;
+}
+
+interface Rol {
+  id_rol: number;
+  nombre_rol: string;
+}
+
+interface Tienda {
+  id_tienda: number;
+  nombre_tienda: string;
 }
 
 const UsuariosRegis: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState<Usuario[]>([]);
 
+  // Estados para edición
+  const [roles, setRoles] = useState<Rol[]>([]);
+  const [tiendas, setTiendas] = useState<Tienda[]>([]);
+  const [editingUser, setEditingUser] = useState<Usuario | null>(null);
+  const [selectedRole, setSelectedRole] = useState<number | null>(null);
+  const [selectedStore, setSelectedStore] = useState<number | null>(null);
+
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await axios.get(
-          'http://localhost:3000/usuario/listar',
-        );
-        setUsers(response.data);
+        const [resUsuarios, resDatos] = await Promise.all([
+          axios.get('http://localhost:3000/usuario/listar'),
+          axios.get('http://localhost:3000/usuario'), // Endpoint para roles y tiendas
+        ]);
+        setUsers(resUsuarios.data);
+        setRoles(resDatos.data.roles);
+        setTiendas(resDatos.data.tiendas);
       } catch (error) {
-        console.error('Error al traer usuarios:', error);
+        console.error('Error al traer datos:', error);
       }
     };
 
@@ -49,6 +71,63 @@ const UsuariosRegis: React.FC = () => {
       month: '2-digit',
       year: 'numeric',
     });
+  };
+
+  const handleEliminar = async (id: number, nombre: string) => {
+    if (window.confirm(`¿Estás seguro de que deseas eliminar al usuario "${nombre}"? Esta acción no se puede deshacer.`)) {
+      try {
+        await axios.delete(`http://localhost:3000/usuario/${id}/eliminar`);
+        setUsers(users.filter((u) => u.id_usuario !== id));
+        alert('✅ Usuario eliminado correctamente');
+      } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        alert('❌ Error al eliminar usuario');
+      }
+    }
+  };
+
+  const handleEditar = (user: Usuario) => {
+    setEditingUser(user);
+    const rolObj = roles.find((r) => r.nombre_rol === user.rol);
+    setSelectedRole(rolObj ? rolObj.id_rol : null);
+
+    if (user.tienda) {
+      const tiendaObj = tiendas.find((t) => t.nombre_tienda === user.tienda);
+      setSelectedStore(tiendaObj ? tiendaObj.id_tienda : null);
+    } else {
+      setSelectedStore(null);
+    }
+  };
+
+  const handleGuardarEdicion = async () => {
+    if (!editingUser || !selectedRole) return;
+
+    try {
+      await axios.put(
+        `http://localhost:3000/usuario/${editingUser.id_usuario}/editar`,
+        {
+          nuevoRolId: selectedRole,
+          idTienda: selectedStore,
+        },
+      );
+
+      const nuevoRolNombre = roles.find((r) => r.id_rol === selectedRole)?.nombre_rol || '';
+      const nuevaTiendaNombre = tiendas.find((t) => t.id_tienda === selectedStore)?.nombre_tienda || null;
+
+      setUsers(
+        users.map((u) =>
+          u.id_usuario === editingUser.id_usuario
+            ? { ...u, rol: nuevoRolNombre, tienda: nuevaTiendaNombre }
+            : u,
+        ),
+      );
+
+      alert('✅ Usuario actualizado correctamente');
+      setEditingUser(null);
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      alert('❌ Error al actualizar usuario');
+    }
   };
 
   return (
@@ -99,9 +178,8 @@ const UsuariosRegis: React.FC = () => {
                 {filteredUsers.map((user, idx) => (
                   <tr
                     key={user.nombre}
-                    className={`${
-                      idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                    } hover:bg-[#e8effc] transition-all`}
+                    className={`${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      } hover:bg-[#e8effc] transition-all`}
                   >
                     <td className="px-6 py-4 font-medium text-gray-800 flex items-center">
                       <div className="w-8 h-8 bg-[#4669AF]/20 text-[#4669AF] rounded-full flex items-center justify-center mr-3 font-bold">
@@ -113,11 +191,10 @@ const UsuariosRegis: React.FC = () => {
                     <td className="px-6 py-4 text-gray-700">{user.rol}</td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          user.estado === 'Activo'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${user.estado === 'Activo'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                          }`}
                       >
                         {user.estado}
                       </span>
@@ -127,11 +204,17 @@ const UsuariosRegis: React.FC = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex space-x-2">
-                        <button className="bg-[#4669AF] hover:bg-[#3a5a9b] text-white px-3 py-1 rounded text-xs flex items-center space-x-1 transition-colors">
+                        <button
+                          className="bg-[#4669AF] hover:bg-[#3a5a9b] text-white px-3 py-1 rounded text-xs flex items-center space-x-1 transition-colors"
+                          onClick={() => handleEditar(user)}
+                        >
                           <Edit className="w-3 h-3" />
                           <span>Editar</span>
                         </button>
-                        <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs flex items-center space-x-1 transition-colors">
+                        <button
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs flex items-center space-x-1 transition-colors"
+                          onClick={() => handleEliminar(user.id_usuario, user.nombre)}
+                        >
                           <Trash2 className="w-3 h-3" />
                           <span>Eliminar</span>
                         </button>
@@ -155,6 +238,66 @@ const UsuariosRegis: React.FC = () => {
       </main>
 
       <Footer />
+
+      {/* Modal de Edición */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Editar Usuario</h2>
+            <p className="mb-4 text-gray-600">Editando a: <strong>{editingUser.nombre}</strong></p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+              <select
+                className="w-full border border-gray-300 rounded px-3 py-2 text-black"
+                value={selectedRole || ''}
+                onChange={(e) => setSelectedRole(Number(e.target.value))}
+              >
+                <option value="">Seleccione un rol</option>
+                {roles.map((rol) => (
+                  <option key={rol.id_rol} value={rol.id_rol}>
+                    {rol.nombre_rol}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Mostrar selector de tienda solo si es Jefe de Tienda (ID 3 usualmente, verificar con roles) */}
+            {roles.find(r => r.id_rol === selectedRole)?.nombre_rol === 'Jefe de Tienda' && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tienda</label>
+                <select
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-black"
+                  value={selectedStore || ''}
+                  onChange={(e) => setSelectedStore(Number(e.target.value))}
+                >
+                  <option value="">Seleccione una tienda</option>
+                  {tiendas.map((tienda) => (
+                    <option key={tienda.id_tienda} value={tienda.id_tienda}>
+                      {tienda.nombre_tienda}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-2 mt-6">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-black"
+                onClick={() => setEditingUser(null)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-[#4669AF] text-white rounded hover:bg-[#3a5a9b]"
+                onClick={handleGuardarEdicion}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

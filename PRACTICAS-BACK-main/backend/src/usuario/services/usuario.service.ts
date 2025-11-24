@@ -43,7 +43,7 @@ interface EditarUsuario {
 
 @Injectable()
 export class UsuarioService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async validarEmail(email: string): Promise<boolean> {
     const usuario = await this.prisma.usuario.findUnique({
@@ -99,7 +99,10 @@ export class UsuarioService {
 
     let idTienda: number | null = null;
 
-    if (rolDB.nombre_rol.toUpperCase() === 'JEFE DE TIENDA') {
+    const nombreRolUpper = rolDB.nombre_rol.toUpperCase();
+    const esJefe = nombreRolUpper === 'JEFE DE TIENDA' || nombreRolUpper === 'JEFE';
+
+    if (esJefe) {
       if (!tienda) {
         throw new BadRequestException(
           'Debe indicar una tienda para el Jefe de Tienda.',
@@ -132,7 +135,7 @@ export class UsuarioService {
       }
     }
 
-    if (rolDB.nombre_rol.toUpperCase() !== 'JEFE DE TIENDA' && tienda) {
+    if (!esJefe && tienda) {
       throw new BadRequestException(
         `No debe incluir una tienda si el rol no es JEFE DE TIENDA.`,
       );
@@ -209,6 +212,7 @@ export class UsuarioService {
 
       return {
         nombre: u.nombre,
+        id_usuario: u.id_usuario, // 👈 Added id_usuario
         correo: u.correo,
         rol,
         estado: u.estado ? 'Activo' : 'Inactivo',

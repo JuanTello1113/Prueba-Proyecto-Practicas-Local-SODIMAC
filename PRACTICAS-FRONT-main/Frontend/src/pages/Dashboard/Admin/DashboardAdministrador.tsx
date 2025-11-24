@@ -25,7 +25,7 @@ const DashboardAdministrador: React.FC = () => {
     correo: string;
     rol: string;
     esJefe: boolean;
-    tienda?: number;
+    tienda?: string;
   }) => {
     try {
       const payload = {
@@ -38,9 +38,11 @@ const DashboardAdministrador: React.FC = () => {
       await axios.post('/usuario', payload);
       alert('✅ Usuario creado correctamente');
       setMostrarFormulario(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('❌ Error al crear usuario:', err);
-      alert('Error al crear usuario');
+      const mensajeError =
+        err.response?.data?.message || 'Error al crear usuario';
+      alert(`❌ ${mensajeError}`);
     }
   };
 

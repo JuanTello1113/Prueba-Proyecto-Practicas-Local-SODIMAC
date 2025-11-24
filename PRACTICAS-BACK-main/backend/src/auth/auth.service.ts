@@ -37,23 +37,26 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   private getPanelTitles(rol: string, nombreTienda?: string) {
     const rolLimpio = rol.trim().toLowerCase().replace(/\s+/g, ' ');
 
     switch (rolLimpio) {
       case 'administrador':
+      case 'admin':
         return {
-          panelTitle: 'Panel Adminsitración',
+          panelTitle: 'Panel Administración',
           userRoleTitle: 'Administrador',
         };
       case 'gestor de nomina':
+      case 'nomina':
         return {
           panelTitle: 'Panel de Nómina',
           userRoleTitle: 'Gestor de Nómina',
         };
       case 'jefe de tienda':
+      case 'jefe':
         return {
           panelTitle: nombreTienda ? `Panel de ${nombreTienda}` : 'Panel Jefe',
           userRoleTitle: nombreTienda
