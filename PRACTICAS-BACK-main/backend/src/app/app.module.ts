@@ -10,6 +10,7 @@ import { UsuarioModule } from 'src/usuario/usuario.module';
 import { AuthModule } from '../auth/auth.module'; // importa el módulo de auth
 import { NotificacionModule } from '../notificacion/notificacion.module';
 import { CorreoLogModule } from '../correo_log/correo_log.module';
+import { HealthModule } from '../health/health.module';
 import { AppController } from './controllers/app.controller';
 
 @Module({
@@ -24,6 +25,7 @@ import { AppController } from './controllers/app.controller';
     RolModule,
     NotificacionModule,
     CorreoLogModule,
+    HealthModule,
   ],
   controllers: [AppController],
 })
