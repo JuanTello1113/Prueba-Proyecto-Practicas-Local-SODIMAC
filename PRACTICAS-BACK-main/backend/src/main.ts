@@ -3,6 +3,9 @@ import { NestFactory } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app/app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
+import { headersMiddleware } from './common/middleware/headers.function';
+import { BigIntInterceptor } from './common/interceptors/bigint.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -36,6 +39,15 @@ async function bootstrap() {
     },
     credentials: true, //permite cruze de cookies
   });
+
+  // Security Headers
+  app.use(helmet());
+
+  // Functional Middleware for Microservice Headers
+  app.use(headersMiddleware);
+
+  // Global BigInt Serialization Interceptor
+  app.useGlobalInterceptors(new BigIntInterceptor());
 
   await app.listen(3000);
 }
