@@ -1,5 +1,6 @@
 import { Ban, Edit, Search, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import BackToDashboard from '../../components/BackToDashboard/BackToDashboard';
 import Footer from '../../components/Footer/Footer';
 import Navbar from '../../components/Navbar/Navbar';
 import apiClient from '../../api/client';
@@ -176,6 +177,7 @@ const GestionUser: React.FC = () => {
   return (
     <div className="min-h-screen w-screen flex flex-col bg-white relative">
       <Navbar />
+      <BackToDashboard />
 
       <main className="flex-grow px-4 pt-16 pb-10 bg-gray-100">
         <div

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import BarraInformativaNovPendientes from '../../components/BarInfo/BarraInfoNovPendientes';
+import BackToDashboard from '../../components/BackToDashboard/BackToDashboard';
 import NovedadesNomPendientes from '../../components/Box_Novedades/Novedades_Nomina/NovNomPendientes';
 import Footer from '../../components/Footer/Footer';
 import FiltrosNomPen from '../../components/Form_Filtros/Filtros_Nomina/FiltrosNominaPen';
@@ -23,6 +24,7 @@ const SoliPendientes: React.FC = () => {
   return (
     <div className="min-h-screen w-screen flex flex-col bg-white">
       <Navbar />
+      <BackToDashboard />
       <main className="flex-grow px-8 pt-8 pb-4">
         <div className="flex justify-between mb-6">
           {/* FILTROS */}

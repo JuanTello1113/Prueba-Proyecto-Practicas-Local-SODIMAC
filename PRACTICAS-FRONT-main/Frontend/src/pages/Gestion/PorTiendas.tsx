@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import BarraInformativaTiendas from '../../components/BarInfo/BarraInfoNovTiendas';
+import BackToDashboard from '../../components/BackToDashboard/BackToDashboard';
 import NovedadesNomTiendas from '../../components/Box_Novedades/Novedades_Nomina/NovNomTiendas';
 import Footer from '../../components/Footer/Footer';
 import FiltrosNomTien from '../../components/Form_Filtros/Filtros_Nomina/FiltrosNominaTien';
@@ -65,6 +66,7 @@ const SoliPorTiendas: React.FC = () => {
   return (
     <div className="min-h-screen w-screen flex flex-col bg-white">
       <Navbar />
+      <BackToDashboard />
       <main className="flex-grow px-8 pt-8 pb-4">
         <div className="flex justify-between mb-6">
           {/* FILTROS */}

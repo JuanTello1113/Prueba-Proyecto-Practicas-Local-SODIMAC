@@ -1,4 +1,5 @@
 import React from 'react';
+import BackToDashboard from '../../../components/BackToDashboard/BackToDashboard';
 import Footer from '../../../components/Footer/Footer';
 import FormVistaPrevIndiv from '../../../components/Form_VistaPrev/FormIndividual';
 import Navbar from '../../../components/Navbar/Navbar';
@@ -7,6 +8,7 @@ const VistPrevNom: React.FC = () => {
   return (
     <div className="min-h-screen w-screen flex flex-col bg-white relative">
       <Navbar />
+      <BackToDashboard />
 
       <main className="flex-grow flex items-center justify-center px-4 py-6 transform -translate-y-6">
         <FormVistaPrevIndiv />

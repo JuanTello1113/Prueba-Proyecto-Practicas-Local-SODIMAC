@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BackToDashboard from '../../../components/BackToDashboard/BackToDashboard';
 import Footer from '../../../components/Footer/Footer';
 import FiltrosNomCons from '../../../components/Form_Filtros/Filtros_Nomina/FiltrosNominaCons';
 import Navbar from '../../../components/Navbar/Navbar';
@@ -21,6 +22,7 @@ const ExportConstNom: React.FC = () => {
   return (
     <div className="min-h-screen w-screen flex flex-col bg-white">
       <Navbar />
+      <BackToDashboard />
       <main className="flex-grow px-8 pt-8 pb-4">
         <div className="flex justify-between mb-6">
           {/* FILTROS */}
