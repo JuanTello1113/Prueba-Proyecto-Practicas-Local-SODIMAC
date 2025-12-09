@@ -26,7 +26,7 @@ const CardsTitle: React.FC<CardProps> = ({
   const layoutClasses =
     iconPosition === 'top'
       ? 'flex flex-col items-center justify-center p-4 space-y-2'
-      : 'flex items-center gap-4 p-5';
+      : 'flex items-center justify-center gap-4 p-5'; // Added justify-center
 
   const iconColorClass = 'text-[#4669AF]';
   const textColorClass = 'text-[#4669AF]';

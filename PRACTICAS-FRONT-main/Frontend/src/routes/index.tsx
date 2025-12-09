@@ -39,7 +39,6 @@ const AppRoutes = () => {
         <Route path="/dashboard-administrador" element={<DashAdmin />} />
         <Route path="/usuarios-registrados" element={<UsuariosRegis />} />
         <Route path="/gestionar-usuarios" element={<GestionUser />} />
-        <Route path="/notificaciones" element={<NotificacionesAdmin />} />
       </Route>
 
       {/* SOLO GESTORES DE NOMINA */}
@@ -85,6 +84,11 @@ const AppRoutes = () => {
           path="/exportacion-consolidados-tienda"
           element={<ExportConsTienda />}
         />
+      </Route>
+
+      {/* RUTAS COMPARTIDAS - Accesibles por todos los roles autenticados */}
+      <Route element={<ProtectedRoute allowedRoles={['admin', 'nomina', 'jefe']} />}>
+        <Route path="/notificaciones" element={<NotificacionesAdmin />} />
       </Route>
 
       {/* RUTA DE ERROR 403 */}

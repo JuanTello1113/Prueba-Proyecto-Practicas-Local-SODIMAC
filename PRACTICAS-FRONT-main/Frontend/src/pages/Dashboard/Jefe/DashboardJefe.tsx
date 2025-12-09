@@ -1,4 +1,5 @@
 import React from 'react';
+import { Bell } from 'lucide-react';
 import {
   FaBus,
   FaClock,
@@ -26,9 +27,9 @@ const DashboardJefe: React.FC = () => {
     <div className="min-h-screen w-screen flex flex-col bg-white">
       <Navbar />
 
-      <main className="flex-grow px-8 pt-4 pb-4">
+      <main className="flex-grow px-8 pt-2 pb-12 flex flex-col">
         {/* ENCABEZADO */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 flex-shrink-0">
           {/* Bienvenida */}
           <div className="flex flex-col justify-center">
             <h2 className="text-xl font-bold text-black">
@@ -55,138 +56,137 @@ const DashboardJefe: React.FC = () => {
           </div>
         </div>
 
-        {/* Contenedor Principal en 3 Columnas */}
-        <div className="flex justify-between pl-6 pt-2">
-          {/* Contenedor de Cards + Franco + Novedades */}
-          <div className="flex">
-            {/* Contenedor de Cards (3x2) */}
-            <div className="flex flex-wrap gap-x-10 gap-y-6 max-w-[580px]">
-              <CardsTitle
-                title="Auxilio de transporte"
-                icon={<FaBus size={40} />}
-                headerLabel="SOLICITUD"
-                color="bg-[#2C3333]"
-                className="h-[110px] w-[260px] rounded-xl"
-                onClick={() =>
-                  navigate('/solicitud-AuxTrans', {
-                    state: {
-                      titulo: 'Auxilio de transporte',
-                      iconName: 'FaBus',
-                    },
-                  })
-                }
-              />
-              <CardsTitle
-                title="Descuento"
-                icon={<FaMoneyBillAlt size={40} />}
-                headerLabel="SOLICITUD"
-                color="bg-[#2C3333]"
-                className="h-[110px] w-[260px] rounded-xl"
-                onClick={() =>
-                  navigate('/solicitud-descuentos', {
-                    state: {
-                      titulo: 'Descuento',
-                      iconName: 'FaMoneyBillAlt',
-                    },
-                  })
-                }
-              />
-              <CardsTitle
-                title="Horas Extra/Recargos"
-                icon={<FaClock size={40} />}
-                headerLabel="SOLICITUD"
-                color="bg-[#2C3333]"
-                className="h-[110px] w-[260px] rounded-xl"
-                onClick={() =>
-                  navigate('/solicitud-horaExt', {
-                    state: {
-                      titulo: 'Horas Extra',
-                      iconName: 'FaClock',
-                    },
-                  })
-                }
-              />
-              <CardsTitle
-                title="Otro Si Definitivo"
-                icon={<FaFileSignature size={40} />}
-                headerLabel="SOLICITUD"
-                color="bg-[#2C3333]"
-                className="h-[110px] w-[260px] rounded-xl"
-                onClick={() =>
-                  navigate('/solicitud-OtroSiDef', {
-                    state: {
-                      titulo: 'Otro Si Definitivo',
-                      iconName: 'FaFileSignature',
-                    },
-                  })
-                }
-              />
-              <CardsTitle
-                title="Otro Si Temporal"
-                icon={<FaFileAlt size={40} />}
-                headerLabel="SOLICITUD"
-                color="bg-[#2C3333]"
-                className="h-[110px] w-[260px] rounded-xl"
-                onClick={() =>
-                  navigate('/solicitud-OtroSiTemp', {
-                    state: {
-                      titulo: 'Otro Si Temporal',
-                      iconName: 'FaFileAlt',
-                    },
-                  })
-                }
-              />
-              <CardsTitle
-                title="Vacaciones"
-                icon={<FaUmbrellaBeach size={40} />}
-                headerLabel="SOLICITUD"
-                color="bg-[#2C3333]"
-                className="h-[110px] w-[260px] rounded-xl"
-                onClick={() =>
-                  navigate('/solicitud-vacaciones', {
-                    state: {
-                      titulo: 'Vacaciones',
-                      iconName: 'FaUmbrellaBeach',
-                    },
-                  })
-                }
-              />
-            </div>
+        {/* Contenedor Principal */}
+        <div className="flex justify-between pl-6 pt-0">
 
-            {/* Columna con Card "Otros" arriba y Franco abajo */}
-            <div className="flex flex-col justify-between pl-6">
-              {/* Card "Otros" */}
-              <div className="mb-4">
-                <CardsTitle
-                  title="Otros"
-                  icon={<FaList size={40} />}
-                  headerLabel="SOLICITUD"
-                  color="bg-[#2C3333]"
-                  className="h-[110px] w-[260px] rounded-xl"
-                  onClick={() =>
-                    navigate('/solicitud-otros', {
-                      state: {
-                        titulo: 'Otros',
-                        iconName: 'FaList',
-                      },
-                    })
-                  }
-                />
-              </div>
-
-              {/* Franco */}
-              <div className="flex items-end">
-                <img
-                  src={Franco}
-                  alt="Franco"
-                  className="object-contain max-w-[300px]"
-                />
-              </div>
-            </div>
+          {/* Columna Izquierda: Grid de Cards (2 columnas x 4 filas) */}
+          <div className="grid grid-cols-2 gap-x-10 gap-y-4">
+            <CardsTitle
+              title="Auxilio de transporte"
+              icon={<FaBus size={35} />}
+              headerLabel="SOLICITUD"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() =>
+                navigate('/solicitud-AuxTrans', {
+                  state: {
+                    titulo: 'Auxilio de transporte',
+                    iconName: 'FaBus',
+                  },
+                })
+              }
+            />
+            <CardsTitle
+              title="Descuento"
+              icon={<FaMoneyBillAlt size={35} />}
+              headerLabel="SOLICITUD"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() =>
+                navigate('/solicitud-descuentos', {
+                  state: {
+                    titulo: 'Descuento',
+                    iconName: 'FaMoneyBillAlt',
+                  },
+                })
+              }
+            />
+            <CardsTitle
+              title="Horas Extra/Recargos"
+              icon={<FaClock size={35} />}
+              headerLabel="SOLICITUD"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() =>
+                navigate('/solicitud-horaExt', {
+                  state: {
+                    titulo: 'Horas Extra',
+                    iconName: 'FaClock',
+                  },
+                })
+              }
+            />
+            <CardsTitle
+              title="Otro Si Definitivo"
+              icon={<FaFileSignature size={35} />}
+              headerLabel="SOLICITUD"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() =>
+                navigate('/solicitud-OtroSiDef', {
+                  state: {
+                    titulo: 'Otro Si Definitivo',
+                    iconName: 'FaFileSignature',
+                  },
+                })
+              }
+            />
+            <CardsTitle
+              title="Otro Si Temporal"
+              icon={<FaFileAlt size={35} />}
+              headerLabel="SOLICITUD"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() =>
+                navigate('/solicitud-OtroSiTemp', {
+                  state: {
+                    titulo: 'Otro Si Temporal',
+                    iconName: 'FaFileAlt',
+                  },
+                })
+              }
+            />
+            <CardsTitle
+              title="Vacaciones"
+              icon={<FaUmbrellaBeach size={35} />}
+              headerLabel="SOLICITUD"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() =>
+                navigate('/solicitud-vacaciones', {
+                  state: {
+                    titulo: 'Vacaciones',
+                    iconName: 'FaUmbrellaBeach',
+                  },
+                })
+              }
+            />
+            <CardsTitle
+              title="Otros"
+              icon={<FaList size={35} />}
+              headerLabel="SOLICITUD"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() =>
+                navigate('/solicitud-otros', {
+                  state: {
+                    titulo: 'Otros',
+                    iconName: 'FaList',
+                  },
+                })
+              }
+            />
+            <CardsTitle
+              title="Notificaciones"
+              icon={<Bell size={35} />}
+              headerLabel="MENSAJES"
+              color="bg-[#2C3333]"
+              className="h-[100px] w-[180px] rounded-xl"
+              onClick={() => navigate('/notificaciones')}
+            />
           </div>
 
-          {/* Columna 3 - Novedades */}
-          <div className="w-1/3 pl-5s flex flex-col items-center space-y-8">
+          {/* Columna Central: Franco */}
+          <div className="flex flex-col justify-end items-center flex-grow">
+            <img
+              src={Franco}
+              alt="Franco"
+              className="object-contain max-w-[300px]"
+            />
+          </div>
+
+          {/* Columna Derecha: Novedades */}
+          <div className="w-1/3 pl-5 flex flex-col items-center space-y-8">
             {/* Novedades Recientes */}
             <NovedadesRecientes />
             {/* HISTÓRICO DE SOLICITUDES */}

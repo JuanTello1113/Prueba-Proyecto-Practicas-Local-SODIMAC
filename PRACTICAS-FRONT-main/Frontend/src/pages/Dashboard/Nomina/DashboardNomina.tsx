@@ -1,5 +1,5 @@
-﻿import { Download } from 'lucide-react';
-import apiClient from '../../api/client';
+﻿import { Download, Bell } from 'lucide-react';
+import apiClient from '../../../api/client';
 import React, { useState } from 'react';
 import { FaClipboardList, FaListAlt, FaStore } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -29,9 +29,9 @@ const DashboardNomina: React.FC = () => {
     <div className="min-h-screen w-screen flex flex-col bg-white">
       <Navbar />
 
-      <main className="flex-grow px-8 pt-8 pb-4">
+      <main className="flex-grow px-8 pt-6 pb-4">
         {/* Bienvenida */}
-        <div className="flex justify-between mb-6">
+        <div className="flex justify-between mb-4">
           <div>
             <h2 className="text-xl font-bold text-black">
               ¡Bienvenido, {user?.nombre || 'Nombre No disponible'}!
@@ -52,7 +52,7 @@ const DashboardNomina: React.FC = () => {
         {/* Contenedor Principal en 3 Columnas */}
         <div className="flex justify-between pl-6">
           {/* Columna 1 - Cards principales */}
-          <div className="flex flex-col w-1/3 mt-6 pt-4">
+          <div className="flex flex-col w-1/3 mt-4 pt-0">
             <div className="grid grid-cols-2 gap-x-24 gap-y-8">
               <Card
                 title="Solicitudes Pendientes"
@@ -78,11 +78,17 @@ const DashboardNomina: React.FC = () => {
                 className="h-[130px] w-[250px] rounded-2xl"
                 onClick={() => setMostrarAccionMasiva(true)}
               />
+              <Card
+                title="Notificaciones"
+                icon={<Bell size={50} />}
+                className="h-[130px] w-[250px] rounded-2xl"
+                onClick={() => navigate('/notificaciones')}
+              />
             </div>
           </div>
 
           {/* Columna 2 - Imagen de Franco */}
-          <div className="w-1/3 flex justify-center items-center pl-32">
+          <div className="w-1/3 flex justify-center items-center pl-0">
             <img
               src={Franco}
               alt="Franco"
