@@ -42,7 +42,7 @@ const AppRoutes = () => {
       </Route>
 
       {/* SOLO GESTORES DE NOMINA */}
-      <Route element={<ProtectedRoute allowedRoles={['nomina']} />}>
+      <Route element={<ProtectedRoute allowedRoles={['nomina', 'jefe']} />}>
         <Route path="/dashboard-nomina" element={<DashNomina />} />
         <Route
           path="/vista-previa-individual-nomina/:id"

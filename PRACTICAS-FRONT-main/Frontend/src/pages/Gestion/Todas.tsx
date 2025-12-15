@@ -13,6 +13,8 @@ interface FiltroParaNom {
   hasta: string;
 }
 
+import { useLocation } from 'react-router-dom';
+
 const TodasSolis: React.FC = () => {
   const [filtros, setFiltros] = useState<FiltroParaNom | undefined>(undefined);
   const [cantidadSolicitudes, setCantidadSolicitudes] = useState(0);
@@ -21,7 +23,10 @@ const TodasSolis: React.FC = () => {
     setFiltros(filtros);
   };
 
-  const [estadoSeleccionado, setEstadoSeleccionado] = useState('TODAS');
+  const location = useLocation();
+  const [estadoSeleccionado, setEstadoSeleccionado] = useState(
+    location.state?.estado || 'TODAS',
+  );
 
   return (
     <div className="min-h-screen w-screen flex flex-col bg-white">

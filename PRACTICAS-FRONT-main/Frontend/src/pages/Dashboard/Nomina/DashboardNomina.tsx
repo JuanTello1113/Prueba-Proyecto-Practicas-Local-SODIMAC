@@ -1,7 +1,8 @@
-﻿import { Download, Bell } from 'lucide-react';
+﻿import AlertFormEstadoSolicitud from '../../../components/Alerts/AlertFormEstadoSolicitud';
+import { Download, Bell } from 'lucide-react';
 import apiClient from '../../../api/client';
 import React, { useState } from 'react';
-import { FaClipboardList, FaListAlt, FaStore } from 'react-icons/fa';
+import { FaClipboardList, FaListAlt, FaStore, FaFilter } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import Franco from '../../../assets/images/Franco_Pensando_1-removebg-preview.png';
 import FormAccionMasiva from '../../../components/Alerts/AlertFormElegirRespuesta';
@@ -19,6 +20,7 @@ const DashboardNomina: React.FC = () => {
 
   const [mostrarFormTienda, setMostrarFormTienda] = useState(false);
   const [mostrarAccionMasiva, setMostrarAccionMasiva] = useState(false);
+  const [mostrarFormEstado, setMostrarFormEstado] = useState(false);
 
   const handleElegirTienda = (tienda: string) => {
     setMostrarFormTienda(false);
@@ -79,6 +81,12 @@ const DashboardNomina: React.FC = () => {
                 onClick={() => setMostrarAccionMasiva(true)}
               />
               <Card
+                title="Por Estado"
+                icon={<FaFilter size={50} />}
+                className="h-[130px] w-[250px] rounded-2xl"
+                onClick={() => setMostrarFormEstado(true)}
+              />
+              <Card
                 title="Notificaciones"
                 icon={<Bell size={50} />}
                 className="h-[130px] w-[250px] rounded-2xl"
@@ -112,6 +120,13 @@ const DashboardNomina: React.FC = () => {
         <FormElegirTienda
           onClose={() => setMostrarFormTienda(false)}
           onSelect={handleElegirTienda}
+        />
+      )}
+
+      {mostrarFormEstado && (
+        <AlertFormEstadoSolicitud
+          onClose={() => setMostrarFormEstado(false)}
+          onSelect={(estado) => console.log(estado)}
         />
       )}
 
