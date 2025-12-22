@@ -245,9 +245,9 @@ export class ArchivoAdjuntoService {
         {
           headers: {
             ...form.getHeaders(),
-            Authorization: `Bearer ${jwtToken}`, // 🔥 ENVÍAS TOKEN EN EL HEADER
+            Authorization: `Bearer ${jwtToken}`, 
           },
-          timeout: 30000,
+          timeout: 600000, 
         },
       );
 
@@ -276,6 +276,11 @@ export class ArchivoAdjuntoService {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Error desconocido';
+
+      if (axios.isAxiosError(error) && (error.code === 'ECONNABORTED' || errorMessage.includes('timeout'))) {
+        throw new Error('El tiempo de espera terminó, vuelva a intentar subir el archivo');
+      }
+
       console.error(
         '❌ Error al validar el archivo desde buffer:',
         errorMessage,
@@ -302,7 +307,7 @@ export class ArchivoAdjuntoService {
         form,
         {
           headers: form.getHeaders(),
-          timeout: 30000,
+          timeout: 300000,
         },
       );
 
@@ -328,6 +333,9 @@ export class ArchivoAdjuntoService {
       };
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+          throw new Error('El tiempo de espera terminó, vuelva a intentar subir el archivo');
+        }
         const status = error.response?.status;
         const responseData = error.response?.data as
           | { message?: string }

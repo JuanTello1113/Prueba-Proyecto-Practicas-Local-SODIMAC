@@ -181,8 +181,17 @@ const Masivo: React.FC = () => {
           </div>
           <p className="font-semibold mt-2">Llenar información</p>
           <p className="text-sm text-gray-600 mt-1">
-            Completa la información requerida para <strong>{titulo}</strong> de
-            acuerdo al formato del archivo.
+            {titulo === 'Otro Si Temporal' || titulo === 'Otro Si Definitivo' ? (
+              <span>
+                Por favor, las jornadas deben diligenciarse así:{' '}
+                <strong>Jornada % (Sin incluir el año)</strong>
+              </span>
+            ) : (
+              <span>
+                Completa la información requerida para <strong>{titulo}</strong>{' '}
+                de acuerdo al formato del archivo.
+              </span>
+            )}
           </p>
         </div>
 

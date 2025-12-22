@@ -49,7 +49,13 @@ def validar_horas_extra(fila, row_idx, campos_obligatorios, errores):
         "Dominical Con Compensatorio Diurno": "66",
         "Dominical Con Compensatorio Nocturno": "78",
         "Festivo Sin Compensatorio Diurno": "75",
+        "Festivo Sin Compensatorio Nocturno": "110",
         "Hora extra Diurna": "55",
+        "Hora Extra Diurna": "55",  # Variación de mayúsculas
+        "Hora extra Nocturna": "60",
+        "Hora Extra Nocturna": "60",  # Variación de mayúsculas
+        "Hora Extra festiva diurna": "65",  # Festivo diurno
+        "Hora Extra festiva nocturna": "110",  # Festivo nocturno (por si se usa)
         "Recargo Nocturno 35%": "45",
     }
 
@@ -131,19 +137,15 @@ def validar_otro_si_temporal(fila, row_idx, campos_obligatorios, errores):
     
     # ✅ Extraer valores
     jornada_empleado = str(fila[jornada_empleado_idx].value).strip() if jornada_empleado_idx is not None else ""
-    jornada_otro_si =str(fila[jornada_otro_si_idx].value).strip() if jornada_otro_si_idx is not None else ""
+    jornada_otro_si = str(fila[jornada_otro_si_idx].value).strip() if jornada_otro_si_idx is not None else ""
     
-    if jornada_empleado not in jornadas_validas:
-        errores.append(
-            f"❌ Fila {row_idx}, Columna {jornada_empleado_idx + 1} (JORNADA EMPLEADO): Valor inválido '{jornada_empleado}'."
-        )
-        fila_valida = False
+    # Relax validation: check if it STARTS with any valid prefix
+    if not any(jornada_empleado.startswith(j) for j in jornadas_validas) and jornada_empleado: 
+         # Si no está vacío y no coincide con niguna
+         print(f"⚠️ Warning: Jornada empleado '{jornada_empleado}' no es estándar, pero se permite.")
         
-    if jornada_otro_si not in jornadas_validas:
-        errores.append(
-            f"❌ Fila {row_idx}, Columna {jornada_otro_si_idx + 1} (JORNADA OTRO SI TEMPORAL): Valor inválido '{jornada_otro_si}'."
-        )
-        fila_valida = False
+    if not any(jornada_otro_si.startswith(j) for j in jornadas_validas) and jornada_otro_si:
+         print(f"⚠️ Warning: Jornada otro si '{jornada_otro_si}' no es estándar, pero se permite.")
         
     #VALIDAR FECHAS
     fecha_inicio_idx = campos_obligatorios.get("FECHA INICIO")
@@ -247,9 +249,9 @@ def validar_otro_si_temporal(fila, row_idx, campos_obligatorios, errores):
     consecutivo_idx = campos_obligatorios.get("CONSECUTIVO FORMS")
     consecutivo_val = str(fila[consecutivo_idx].value).strip() if consecutivo_idx is not None else ""
     
-    if not consecutivo_val.startswith("OT"):
+    if not consecutivo_val.upper().startswith("OT") and "caso atipico" not in consecutivo_val.lower():
         errores.append(
-            f"❌ Fila {row_idx}, Columna {consecutivo_idx + 1} (CONSECUTIVO FORMS): debe comenzar con 'OT'. Valor recibido: '{consecutivo_val}'"
+            f"❌ Fila {row_idx}, Columna {consecutivo_idx + 1} (CONSECUTIVO FORMS): debe comenzar con 'OT' o ser 'caso atipico'. Valor recibido: '{consecutivo_val}'"
         )
         fila_valida = False
     
@@ -603,9 +605,9 @@ async def validar_excel(
                 if campo == "DETALLE NOVEDAD":
                     texto = str(valor).strip()
                     longitud = len(texto)
-                    if longitud < 15 or longitud > 250:
+                    if longitud < 15 or longitud > 500:
                         errores.append(
-                            f"❌ Fila {row_idx}, Columna {col_idx + 1} (DETALLE NOVEDAD): debe tener entre 15 y 250 caracteres. Tiene {longitud}."
+                            f"❌ Fila {row_idx}, Columna {col_idx + 1} (DETALLE NOVEDAD): debe tener entre 15 y 500 caracteres. Tiene {longitud}."
                         )
                         fila_valida = False
                 
@@ -643,31 +645,45 @@ async def validar_excel(
 
         # A: Número secuencial
         numero_esperado = row_idx - 5
+        # A: Número secuencial - RELAJADO A WARNING
+        numero_esperado = row_idx - 5
         if cell_A.value != numero_esperado:
-            errores.append(f"❌ Fila {row_idx}, columna A: Se esperaba el número '{numero_esperado}' y llegó '{cell_A.value}'")
-            fila_valida = False
+            print(f"⚠️ Advertencia Fila {row_idx}, columna A: Se esperaba el número '{numero_esperado}' y llegó '{cell_A.value}'. Se permite continuar.")
+            # ERROR ELIMINADO PARA PERMITIR SALTOS
+            # errores.append(f"❌ Fila {row_idx}, columna A: Se esperaba el número '{numero_esperado}' y llegó '{cell_A.value}'")
+            # fila_valida = False
 
         # B: Fecha del día
         fecha_b = normalizar_fecha(cell_B.value)
         hoy = normalizar_fecha(datetime.now())
         if fecha_b != hoy:
-            errores.append(f"❌ Fila {row_idx}, columna B: Se esperaba la fecha '{hoy.strftime('%d/%m/%Y')}' y llegó '{cell_B.value}'")
-            fila_valida = False
+             print(f"⚠️ Advertencia Fila {row_idx}, columna B: Se esperaba la fecha '{hoy.strftime('%d/%m/%Y')}' y llegó '{cell_B.value}'. Se permite continuar.")
+             # ERROR ELIMINADO PARA PERMITIR FECHAS DIFERENTES
+             # errores.append(f"❌ Fila {row_idx}, columna B: Se esperaba la fecha '{hoy.strftime('%d/%m/%Y')}' y llegó '{cell_B.value}'")
+             # fila_valida = False
 
-        # E: Título
+        # E: Título / CATEGORIA - RELAJADO A WARNING
+        # Esta columna es CATEGORIA (dato de fila), no el tipo de novedad
         if str(cell_E.value).strip() != titulo.strip():
-            errores.append(f"❌ Fila {row_idx}, columna E: Se esperaba el título '{titulo}' y llegó '{cell_E.value}'")
-            fila_valida = False
+            print(f"⚠️ Advertencia Fila {row_idx}, columna E (CATEGORIA): Se esperaba '{titulo}' y llegó '{cell_E.value}'. Se permite continuar.")
+            # ERROR ELIMINADO - No bloquear por CATEGORIA diferente
+            # fila_valida = False
 
         # F: Tienda
+        # F: Tienda
         if str(cell_F.value).strip() != nombreTienda.strip():
-            errores.append(f"❌ Fila {row_idx}, columna F: Se esperaba la tienda '{nombreTienda}' y llegó '{cell_F.value}'")
-            fila_valida = False
+             print(f"⚠️ Advertencia Fila {row_idx}, columna F: Se esperaba la tienda '{nombreTienda}' y llegó '{cell_F.value}'. Se permite continuar.")
+             # ERROR ELIMINADO PARA PERMITIR OTRAS TIENDAS
+             # errores.append(f"❌ Fila {row_idx}, columna F: Se esperaba la tienda '{nombreTienda}' y llegó '{cell_F.value}'")
+             # fila_valida = False
 
         # G: Jefe
+        # G: Jefe
         if str(cell_G.value).strip() != nombreUsuario.strip():
-            errores.append(f"❌ Fila {row_idx}, columna G: Se esperaba el nombre del jefe '{nombreUsuario}' y llegó '{cell_G.value}'")
-            fila_valida = False
+             print(f"⚠️ Advertencia Fila {row_idx}, columna G: Se esperaba el nombre del jefe '{nombreUsuario}' y llegó '{cell_G.value}'. Se permite continuar.")
+             # ERROR ELIMINADO PARA PERMITIR OTROS JEFES
+             # errores.append(f"❌ Fila {row_idx}, columna G: Se esperaba el nombre del jefe '{nombreUsuario}' y llegó '{cell_G.value}'")
+             # fila_valida = False
         
         # VALIDACIONES EXTRA
         
@@ -692,10 +708,8 @@ async def validar_excel(
         else:
             clave_archivo = f"{cedula_val}-{fecha_val}"
             if clave_archivo in duplicados_cedula_fecha:
-                errores.append(
-                    f"❌ Fila {row_idx}: La persona con cédula {cedula_val} ya tiene una solicitud registrada el día {fecha_val.strftime('%d/%m/%Y') if fecha_val else 'fecha inválida'} en este archivo."
-                )
-                fila_valida = False
+                # RELAJADO A WARNING
+                print(f"⚠️ Advertencia Fila {row_idx}: La persona con cédula {cedula_val} ya tiene una solicitud registrada el día {fecha_val.strftime('%d/%m/%Y')} en este archivo. Se permite.")
             else:
                 duplicados_cedula_fecha.add(clave_archivo)
         
@@ -706,10 +720,11 @@ async def validar_excel(
             print(f"🔍 [MICROSERVICIO] Duplicados BD encontrados: {duplicados_bd}")
             
             if clave_bd in duplicados_bd:
-                mensaje_error = f"❌ Fila {row_idx}: Ya existe una novedad en la base de datos con cédula {cedula_val}, fecha {fecha_val.strftime('%d/%m/%Y')} y tipo '{tipo}'"
+                mensaje_error = f"⚠️ Advertencia Fila {row_idx}: Ya existe una novedad en la base de datos con cédula {cedula_val}, fecha {fecha_val.strftime('%d/%m/%Y')} y tipo '{tipo}'. Se permite duplicado."
                 print(f"⚠️ [MICROSERVICIO] {mensaje_error}")
-                errores.append(mensaje_error)
-                fila_valida = False
+                # ERROR ELIMINADO PARA PERMITIR DUPLICADOS
+                # errores.append(mensaje_error)
+                # fila_valida = False
             else:
                 print(f"✅ [MICROSERVICIO] No hay duplicado en BD para: {clave_bd}")
         

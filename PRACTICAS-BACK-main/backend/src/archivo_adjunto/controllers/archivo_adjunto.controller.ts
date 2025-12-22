@@ -321,10 +321,10 @@ export class ArchivoAdjuntoController {
       if (
         !detalle ||
         detalle.trim().length < 15 ||
-        detalle.trim().length > 250
+        detalle.trim().length > 500
       ) {
         errores.push(
-          'El detalle debe tener entre 15 y 250 caracteres. Asegúrate de incluir suficiente información.',
+          'El detalle debe tener entre 15 y 500 caracteres. Asegúrate de incluir suficiente información.',
         );
       }
 
