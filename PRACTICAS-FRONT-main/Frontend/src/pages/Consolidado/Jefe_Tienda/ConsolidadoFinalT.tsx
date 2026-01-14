@@ -25,14 +25,14 @@ const ExportConsTienda: React.FC = () => {
     <div className="min-h-screen w-screen flex flex-col bg-white">
       <Navbar />
       <BackToDashboard />
-      <main className="flex-grow py-6">
-        <div className="flex flex-col lg:flex-row h-full">
+      <main className="flex-grow pt-24 pb-32 w-full max-w-[1920px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-6 w-full px-4 sm:px-8">
           {/* FILTROS */}
-          <div className="lg:w-1/4 px-4 lg:pl-10 lg:pr-0 translate-y-7">
+          <div className="w-full lg:w-1/4 flex justify-center lg:justify-start">
             <FiltroExportConsTienda onApply={aplicarFiltros} />
           </div>
           {/* TABLA */}
-          <div className="lg:w-3/4 px-4 lg:pl-0 lg:pr-6">
+          <div className="w-full lg:w-3/4">
             <VistaArchConsTienda filtros={filtros} />
           </div>
         </div>

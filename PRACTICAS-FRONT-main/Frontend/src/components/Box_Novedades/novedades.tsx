@@ -89,7 +89,7 @@ const NovedadesRecientes: React.FC = () => {
   };
 
   return (
-    <div className="text-sm font-bold w-[550px] -translate-x-7 bg-gray-400 rounded-2xl shadow-inner flex flex-col space-y-3 p-3">
+    <div className="text-sm font-bold w-full max-w-md bg-gray-100 rounded-2xl shadow-inner flex flex-col space-y-3 p-3">
       <div className="flex flex-col space-y-3 max-h-[200px] overflow-y-auto pr-1">
         {[...novedades]
           .sort((a, b) => b.id_novedad - a.id_novedad)
@@ -109,17 +109,16 @@ const NovedadesRecientes: React.FC = () => {
             return (
               <div
                 key={novedad.id_novedad}
-                className="flex items-start bg-white rounded-xl shadow-sm p-3 relative cursor-pointer transform transition-transform duration-150 hover:scale-[1.01]"
+                className="flex items-start bg-white rounded-xl shadow-sm p-3 relative cursor-pointer transform transition-transform duration-150 hover:scale-[1.01] border border-gray-100"
                 onClick={() =>
                   navigate(
                     novedad.es_masiva
                       ? user?.esNomina
-                        ? `/vista-previa-masiva-novedad-nomina/${novedad.id_novedad}` // Masiva Nómina
-                        : `/vista-previa-masiva-tienda/${novedad.id_novedad}` //  Masiva Tienda
+                        ? `/vista-previa-masiva-novedad-nomina/${novedad.id_novedad}`
+                        : `/vista-previa-masiva-tienda/${novedad.id_novedad}`
                       : user?.esNomina
-                        ? `/vista-previa-individual-nomina/${novedad.id_novedad}` // Individual Nómina
-                        : `/vista-previa-individual-tienda/${novedad.id_novedad}`, // Individual Tienda
-
+                        ? `/vista-previa-individual-nomina/${novedad.id_novedad}`
+                        : `/vista-previa-individual-tienda/${novedad.id_novedad}`,
                     {
                       state: {
                         id_novedad: novedad.id_novedad,
@@ -142,44 +141,48 @@ const NovedadesRecientes: React.FC = () => {
                   )
                 }
               >
+                {/* Color Strip */}
                 <div
                   className={`w-1.5 h-full rounded-l-md absolute left-0 top-0 bottom-0 ${getColorPorEstado(estadoVisual)}`}
                 />
-                <div className="pl-3 pr-1 flex-1">
-                  <p className="text-sm font-semibold text-gray-800">
-                    {`SOLICITUD #0${novedad.id_novedad} ${estadoVisual} - ${
-                      novedad.tipo_novedad?.nombre_tipo ?? 'Sin tipo'
-                    }`}
+
+                <div className="pl-3 pr-1 flex-1 flex flex-col gap-1.5">
+                  {/* Header: Title + Date */}
+                  <div className="flex justify-between items-start w-full">
+                    <p className="text-sm font-bold text-gray-800 leading-tight mr-2">
+                      SOLICITUD #{novedad.id_novedad}
+                    </p>
+                    <span className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0 mt-0.5">
+                      {novedad.fecha_creacion ? new Date(novedad.fecha_creacion).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }) : ''}
+                    </span>
+                  </div>
+
+                  {/* Subtitle / Type */}
+                  <p className="text-xs font-semibold text-gray-600 -mt-1">
+                    {estadoVisual} - {novedad.tipo_novedad?.nombre_tipo ?? 'Sin tipo'}
                   </p>
 
+                  {/* Message */}
                   {mensajeTexto && (
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <span>{icono}</span>
-                      <span>{mensajeTexto}</span>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 p-1.5 rounded-md">
+                      <span className="flex-shrink-0">{icono}</span>
+                      <span className="leading-snug">{mensajeTexto}</span>
                     </div>
                   )}
 
-                  <p className="text-[10px] text-gray-500 italic">
-                    Tienda: {tiendaNombre}
+                  {/* Footer Details */}
+                  <p className="text-[10px] text-gray-400 mt-0.5">
+                    <span className="font-medium text-gray-600">{tiendaNombre}</span>
                     {novedad.es_masiva && (
                       <>
-                        {' • '}Solicitudes:{' '}
-                        {novedad.cantidad_solicitudes ?? 'N/A'}
-                        {' • '}📎 Archivo adjunto
+                        <span className="mx-1">•</span>
+                        {novedad.cantidad_solicitudes ?? 0} sol.
+                        <span className="mx-1">•</span>
+                        📎 Adjunto
                       </>
                     )}
                   </p>
                 </div>
-                <span className="text-[10px] text-gray-800 absolute top-2 right-3">
-                  {new Date(novedad.fecha_creacion).toLocaleDateString(
-                    'es-CO',
-                    {
-                      day: '2-digit',
-                      month: 'long',
-                      year: 'numeric',
-                    },
-                  )}
-                </span>
               </div>
             );
           })}

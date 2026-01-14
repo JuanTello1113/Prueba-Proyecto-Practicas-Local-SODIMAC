@@ -154,113 +154,131 @@ const Masivo: React.FC = () => {
   };
 
   return (
-    <div className="grid gap-6 max-w-4xl mx-auto">
+    <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+      {/* ENCABEZADO */}
+      <div className="text-center mb-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+          Gestione las novedades de <span className="text-[#4669AF]">{titulo || 'Novedad'}</span> para los empleados
+        </h2>
+        <p className="text-gray-500 max-w-2xl mx-auto">
+          Siga los pasos a continuación para procesar múltiples solicitudes de manera eficiente.
+        </p>
+      </div>
+
       {/* Pasos */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
         {/* Paso 1 */}
-        <div className="border rounded p-4 shadow border-black">
-          <div className="w-8 h-8 rounded-full bg-[#4669AF] mx-auto flex items-center justify-center font-bold text-sm">
-            1
+        <div className="relative group">
+          <div className="absolute inset-0 bg-blue-50 rounded-xl transform transition-transform group-hover:scale-105 duration-300"></div>
+          <div className="relative bg-white border border-gray-200 p-6 rounded-xl shadow-sm h-full flex flex-col items-center text-center transition-all group-hover:border-blue-200">
+            <div className="w-12 h-12 bg-blue-100 text-[#4669AF] rounded-full flex items-center justify-center font-bold text-lg mb-4 group-hover:bg-[#4669AF] group-hover:text-white transition-colors">
+              1
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">Descargar Plantilla</h3>
+            <p className="text-sm text-gray-500 mb-6 flex-grow">
+              Obtenga el formato Excel requerido para este tipo de novedad.
+            </p>
+            <button
+              onClick={descargarPlantilla}
+              className="w-full bg-gray-800 text-white px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-all font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <span className="text-lg">⬇</span> Descargar
+            </button>
           </div>
-          <p className="font-semibold mt-2">Descarga la plantilla</p>
-          <p className="text-sm text-gray-600 mt-1">
-            Descarga la plantilla con el formato requerido por Nómina
-          </p>
-          <button
-            onClick={descargarPlantilla}
-            className="mt-2 bg-gray-800 text-white px-4 py-1 rounded hover:opacity-90"
-          >
-            Descargar Plantilla
-          </button>
         </div>
 
         {/* Paso 2 */}
-        <div className="border rounded p-4 shadow border-black">
-          <div className="w-8 h-8 rounded-full bg-[#4669AF] mx-auto flex items-center justify-center font-bold text-sm">
-            2
+        <div className="relative group">
+          <div className="absolute inset-0 bg-blue-50 rounded-xl transform transition-transform group-hover:scale-105 duration-300"></div>
+          <div className="relative bg-white border border-gray-200 p-6 rounded-xl shadow-sm h-full flex flex-col items-center text-center transition-all group-hover:border-blue-200">
+            <div className="w-12 h-12 bg-blue-100 text-[#4669AF] rounded-full flex items-center justify-center font-bold text-lg mb-4 group-hover:bg-[#4669AF] group-hover:text-white transition-colors">
+              2
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">Diligenciar</h3>
+            <p className="text-sm text-gray-500 mb-4 flex-grow">
+              Completa la información requerida en la plantilla descargada.
+            </p>
+            <div className="bg-yellow-50 text-yellow-800 text-xs p-3 rounded-lg border border-yellow-100 w-full text-left">
+              <strong>Tips:</strong>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>No modifique los encabezados</li>
+                <li>Use los códigos o nombres exactos</li>
+              </ul>
+            </div>
           </div>
-          <p className="font-semibold mt-2">Llenar información</p>
-          <p className="text-sm text-gray-600 mt-1">
-            {titulo === 'Otro Si Temporal' || titulo === 'Otro Si Definitivo' ? (
-              <span>
-                Por favor, las jornadas deben diligenciarse así:{' '}
-                <strong>Jornada % (Sin incluir el año)</strong>
-              </span>
-            ) : (
-              <span>
-                Completa la información requerida para <strong>{titulo}</strong>{' '}
-                de acuerdo al formato del archivo.
-              </span>
-            )}
-          </p>
         </div>
 
         {/* Paso 3 */}
-        <div className="border rounded p-4 shadow border-black">
-          <div className="w-8 h-8 rounded-full bg-[#4669AF] mx-auto flex items-center justify-center font-bold text-sm">
-            3
+        <div className="relative group">
+          <div className="absolute inset-0 bg-blue-50 rounded-xl transform transition-transform group-hover:scale-105 duration-300"></div>
+          <div className="relative bg-white border border-gray-200 p-6 rounded-xl shadow-sm h-full flex flex-col items-center text-center transition-all group-hover:border-blue-200">
+            <div className="w-12 h-12 bg-blue-100 text-[#4669AF] rounded-full flex items-center justify-center font-bold text-lg mb-4 group-hover:bg-[#4669AF] group-hover:text-white transition-colors">
+              3
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">Subir Archivo</h3>
+            <p className="text-sm text-gray-500 mb-6 flex-grow">
+              Cargue el archivo Excel completado para su validación.
+            </p>
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              id="file-upload"
+              ref={fileInputRef} // Ensure ref is attached
+              onChange={handleFileChange}
+            />
+            <label
+              htmlFor="file-upload"
+              className={`w-full px-4 py-2.5 rounded-lg cursor-pointer transition-all font-medium text-sm flex items-center justify-center gap-2 ${selectedFile
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-[#4669AF] text-white hover:bg-[#36528A]'
+                }`}
+            >
+              {selectedFile ? '✅ Archivo Cargado' : '☁ Subir Excel'}
+            </label>
+            {selectedFile && (
+              <span className="text-xs text-gray-500 mt-2 truncate w-full px-2 block">
+                {selectedFile.name}
+              </span>
+            )}
           </div>
-          <p className="font-semibold mt-2">Subir Archivo</p>
-          <p className="text-sm text-gray-600 mt-1">
-            Cargar archivo completo con tus solicitudes a procesar
-          </p>
-          <button
-            className={`mt-2 text-white px-4 py-1 rounded ${selectedFile
-              ? 'bg-gray-800 hover:opacity-90'
-              : 'bg-gray-400 cursor-not-allowed'
-              }`}
-            disabled={!selectedFile}
-            onClick={subirArchivo}
-          >
-            Subir Archivo
-          </button>
         </div>
       </div>
 
-      {/* Zona de arrastrar y soltar archivo */}
-      <div
-        onDrop={handleFileDrop}
-        onDragOver={handleDragOver}
-        className="border border-dashed border-black p-4 rounded text-center"
-      >
-        <p
-          className="font-semibold text-black hover:text-blue-600 hover:underline cursor-pointer"
-          onClick={triggerFileSelect}
-        >
-          Arrastra y suelta tu archivo aquí
-        </p>
+      {/* Zona de Drag & Drop (Opcional, la ocultamos si ya hay botones grandes, o la dejamos como alternativa visual) 
+          Vamos a dejarla pero estilizada mejor si se desea, o quitarla para simplificar. 
+          El diseño de 3 tarjetas con botón de subir en la 3ra reemplaza la necesidad de la zona grande inferior.
+      */}
 
-        {/* Mensaje dinámico */}
-        {selectedFile ? (
-          <p className="text-green-600 font-medium mt-2">
-            Archivo seleccionado: {selectedFile.name}
-          </p>
-        ) : (
-          <p className="text-sm text-gray-500 mt-2">
-            Recuerda que debe ser .xlsx con nuestro formato para poder revisar
-            de manera correcta tu solicitud
-          </p>
-        )}
-
-        {/* Input oculto */}
-        <input
-          type="file"
-          id="archivo"
-          accept=".xlsx"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          className="hidden"
-          aria-label="Subir archivo Excel"
-        />
-      </div>
-
-      {/* Botón regresar */}
-      <div className="flex justify-end p-2 mt-[-15px]">
+      {/* Boton Accion Principal y Regresar */}
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-6 border-t border-gray-100 mt-4">
         <button
-          className="bg-[#4669AF] text-white px-8 py-1 rounded-lg hover:opacity-90"
+          className="text-gray-600 hover:text-gray-800 font-medium px-4 py-2"
           onClick={() => navigate('/dashboard-jefe')}
         >
-          Regresar
+          Cancelar
+        </button>
+        <button
+          onClick={
+            // Si hay archivo seleccionado pero no subido, validamos. Si ya subió (archivoSubido), solo mostramos exito?
+            // La logica original usa un boton "Subir Archivo" dentro de la tarjeta 3 que dispara handleFileChange,
+            // y un boton final que dispara subirArchivo (o handleUpload si existiera, aqui se llama subirArchivo).
+            subirArchivo
+          }
+          disabled={!selectedFile || isLoading}
+          className={`px-8 py-2.5 rounded-lg text-white font-bold shadow-md transition-all transform active:scale-95 flex items-center justify-center gap-2 ${!selectedFile || isLoading
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-[#4669AF] hover:bg-[#36528A] hover:shadow-lg'
+            }`}
+        >
+          {isLoading ? (
+            <>
+              <FiClock className="animate-spin" /> Procesando...
+            </>
+          ) : (
+            'Procesar Solicitudes'
+          )}
         </button>
       </div>
 
@@ -301,6 +319,7 @@ const Masivo: React.FC = () => {
           </p>
         </div>
       )}
+
     </div>
   );
 };

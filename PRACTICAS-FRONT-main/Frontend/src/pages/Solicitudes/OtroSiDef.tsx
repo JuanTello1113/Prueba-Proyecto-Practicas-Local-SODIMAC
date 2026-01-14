@@ -16,7 +16,7 @@ const OtroSiDef: React.FC = () => {
         <AlertDiasNovedades mostrarSoloCorto />
       </div>
 
-      <main className="flex-grow flex items-center justify-center px-4 py-6 transform -translate-y-8">
+      <main className="flex-grow flex items-center justify-center px-4 pt-24 pb-32">
         <FormSolicitudes />
       </main>
 

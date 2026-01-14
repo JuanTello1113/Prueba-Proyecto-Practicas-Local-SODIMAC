@@ -19,7 +19,7 @@ const ExportacionesConsolidadas: React.FC = () => {
   };
 
   return (
-    <div className="w-[400px] mt-8 bg-[#4669AF] text-white shadow-xl rounded-xl p-5 hover:scale-[1.03] transition-transform duration-300 cursor-pointer group">
+    <div className="w-full max-w-[400px] mt-8 mb-4 bg-[#4669AF] text-white shadow-xl rounded-xl p-5 hover:scale-[1.03] transition-transform duration-300 cursor-pointer group">
       <div className="flex items-center gap-3 mb-3">
         <FaFileAlt className="text-white" size={26} />
         <h3 className="text-lg font-bold">Histórico de Solicitudes</h3>

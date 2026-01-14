@@ -1,5 +1,4 @@
 ﻿import axios from 'axios';
-import apiClient from '../../api/client';
 import { es } from 'date-fns/locale';
 import { ChevronDown, Search } from 'lucide-react';
 import React, { forwardRef, useEffect, useState } from 'react';
@@ -101,7 +100,7 @@ const FiltrosNomPen: React.FC<Props> = ({ onApply, tiendaInicial }) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg border border-gray-300 shadow-[2px_8px_12px_rgba(0,0,0,0.8)] hover:shadow-[4px_10px_14px_rgba(0,0,0,1)] hover:scale-105 transition-all duration-300 w-[280px]">
+    <div className="bg-white p-8 rounded-lg border border-gray-300 shadow-[2px_8px_12px_rgba(0,0,0,0.8)] hover:shadow-[4px_10px_14px_rgba(0,0,0,1)] hover:scale-105 transition-all duration-300 w-full max-w-xs">
       {/* HEADER */}
       <div className="flex items-start mb-6">
         <div className="mr-3 mt-1">
@@ -234,14 +233,13 @@ const FiltrosNomPen: React.FC<Props> = ({ onApply, tiendaInicial }) => {
             !filtros.hasta &&
             (!!tiendaInicial || !filtros.tienda) // <- ¡corregido aquí!
           }
-          className={`flex-1 text-white text-sm font-medium rounded-md h-10 transition-colors flex items-center justify-center text-center ${
-            filtros.tipo ||
-            filtros.desde ||
-            filtros.hasta ||
-            (!tiendaInicial && filtros.tienda)
+          className={`flex-1 text-white text-sm font-medium rounded-md h-10 transition-colors flex items-center justify-center text-center ${filtros.tipo ||
+              filtros.desde ||
+              filtros.hasta ||
+              (!tiendaInicial && filtros.tienda)
               ? 'bg-gray-700 hover:bg-gray-900 cursor-pointer'
               : 'bg-gray-300 cursor-not-allowed opacity-50 text-black'
-          }`}
+            }`}
         >
           Limpiar Filtros
         </button>

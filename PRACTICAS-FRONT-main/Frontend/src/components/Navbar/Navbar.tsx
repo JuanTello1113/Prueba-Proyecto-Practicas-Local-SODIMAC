@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
         </button>
 
         {/* Título del panel */}
-        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-lg font-semibold tracking-wide uppercase">
+        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-sm sm:text-lg font-semibold tracking-wide uppercase whitespace-nowrap overflow-hidden text-ellipsis max-w-[50%] text-center">
           {user?.panelTitle || 'No disponible'}
         </h1>
 

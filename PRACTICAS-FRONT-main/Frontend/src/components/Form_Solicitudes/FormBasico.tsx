@@ -115,81 +115,81 @@ const FormularioBasico: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label className="text-black block font-medium mb-1">
-          Cédula del Empleado <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          inputMode="numeric"
-          placeholder="Ej: 1000380380"
-          className="w-full border rounded px-3 py-2 bg-white border-gray-600 text-black"
-          value={cedula}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (/^\d*$/.test(value)) setCedula(value);
-          }}
-        />
+    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <label className="text-gray-800 block font-semibold mb-2">
+            Cédula del Empleado <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="Ej: 1000380380"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#4669AF] focus:border-transparent outline-none transition-all"
+            value={cedula}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) setCedula(value);
+            }}
+          />
+        </div>
+        <div>
+          <label className="text-gray-800 block font-semibold mb-2">
+            Nombres Completos <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Ej: Camilo Andrés Gómez Bernal"
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#4669AF] focus:border-transparent outline-none transition-all"
+            value={nombre}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s'.-]*$/.test(value)) {
+                setNombre(value);
+              }
+            }}
+          />
+        </div>
       </div>
-      <div>
-        <label className="text-black block font-medium mb-1">
-          Nombres Completos <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          placeholder="Ej: Camilo Andrés Gómez Bernal"
-          className="w-full border rounded px-3 py-2 bg-white border-gray-600 text-black"
-          value={nombre}
-          onChange={(e) => {
-            const value = e.target.value;
-            if (/^[A-Za-zÁÉÍÓÚÑáéíóúñ\s'.-]*$/.test(value)) {
-              setNombre(value);
-            }
-          }}
-        />
-      </div>
-      {/* Espacio vacío para mantener el grid */}
-      <div></div>
 
-      {/* DETALLE + BOTONES (grid interna de 2 columnas) */}
-      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-[1fr_140px] gap-4 items-start">
+      {/* DETALLE + BOTONES */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-6 items-start">
         {/* DETALLE */}
         <div>
-          <label className="text-black block font-medium mb-1">
+          <label className="text-gray-800 block font-semibold mb-2">
             Escribe el detalle de la novedad{' '}
             <span className="text-red-500">*</span>
           </label>
           <textarea
             placeholder="Escribe detalladamente la situación que amerita el auxilio de transporte…"
-            className="w-full border rounded px-3 py-2 bg-white border-gray-600 text-black"
-            rows={4}
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white focus:ring-2 focus:ring-[#4669AF] focus:border-transparent outline-none transition-all resize-none"
+            rows={5}
             maxLength={250}
             value={detalle}
             onChange={(e) => setDetalle(e.target.value)}
           />
-          <div className="text-sm text-right text-gray-500">
+          <div className="text-sm text-right text-gray-500 mt-1">
             {detalle.length}/250
           </div>
         </div>
 
-        {/* BOTONES al lado derecho */}
-        <div className="flex flex-col gap-2 py-10 items-end">
+        {/* BOTONES */}
+        <div className="flex flex-col-reverse sm:flex-row lg:flex-col gap-3 pt-0 lg:pt-8 w-full">
           <button
-            className={`w-full px-4 py-2 rounded-lg text-white ${isFormValid
-                ? 'bg-[#4669AF] hover:opacity-90'
-                : 'bg-gray-400 cursor-not-allowed'
-              }`}
-            disabled={!isFormValid}
-            onClick={handleSubmit} // <- nuevo
-          >
-            Guardar
-          </button>
-          <button
-            className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:opacity-90"
+            className="w-full bg-white text-gray-700 border border-gray-300 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium"
             onClick={() => navigate('/dashboard-jefe')}
           >
             Cancelar
+          </button>
+          <button
+            className={`w-full px-4 py-3 rounded-lg text-white font-medium shadow-md transition-all transform active:scale-95 ${isFormValid
+                ? 'bg-[#4669AF] hover:bg-[#36528A] hover:shadow-lg'
+                : 'bg-gray-400 cursor-not-allowed'
+              }`}
+            disabled={!isFormValid}
+            onClick={handleSubmit}
+          >
+            Guardar
           </button>
         </div>
       </div>
