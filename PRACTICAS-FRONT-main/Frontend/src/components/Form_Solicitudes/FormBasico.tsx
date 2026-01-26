@@ -8,14 +8,19 @@ import { useAuth } from '../../context/useAuth';
 import ErroresArchivoAlert from '../Alerts/ErroresArchivoAlert';
 import ExitoArchivoAlert from '../Alerts/ExitoArchivoAlert';
 
-const FormularioBasico: React.FC = () => {
+interface FormularioBasicoProps {
+  titulo?: string;
+  onAddToQueue?: (formData: { cedula: number; nombre: string; detalle: string }) => void;
+}
+
+const FormularioBasico: React.FC<FormularioBasicoProps> = ({ titulo: propsTitulo, onAddToQueue }) => {
   const { user } = useAuth();
   const [cedula, setCedula] = useState('');
   const [nombre, setNombre] = useState('');
   const [detalle, setDetalle] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const titulo = location.state?.titulo || 'No disponible';
+  const titulo = propsTitulo || location.state?.titulo || 'No disponible';
 
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -38,6 +43,20 @@ const FormularioBasico: React.FC = () => {
   }, [cedula, nombre, detalle]);
 
   const handleSubmit = async () => {
+    // Si viene la prop onAddToQueue, usamos esa lógica en vez de enviar al backend
+    if (onAddToQueue) {
+      onAddToQueue({
+        cedula: Number(cedula),
+        nombre,
+        detalle,
+      });
+      // Limpiamos el form o damos feedback visual
+      setCedula('');
+      setNombre('');
+      setDetalle('');
+      return;
+    }
+
     try {
       setIsLoading(true);
       setErroresArchivo(null);
@@ -125,7 +144,7 @@ const FormularioBasico: React.FC = () => {
             type="text"
             inputMode="numeric"
             placeholder="Ej: 1000380380"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#4669AF] focus:border-transparent outline-none transition-all"
+            className="w-full bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#4669AF] focus:border-transparent outline-none transition-all"
             value={cedula}
             onChange={(e) => {
               const value = e.target.value;
@@ -140,7 +159,7 @@ const FormularioBasico: React.FC = () => {
           <input
             type="text"
             placeholder="Ej: Camilo Andrés Gómez Bernal"
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#4669AF] focus:border-transparent outline-none transition-all"
+            className="w-full bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-[#4669AF] focus:border-transparent outline-none transition-all"
             value={nombre}
             onChange={(e) => {
               const value = e.target.value;
@@ -183,13 +202,25 @@ const FormularioBasico: React.FC = () => {
           </button>
           <button
             className={`w-full px-4 py-3 rounded-lg text-white font-medium shadow-md transition-all transform active:scale-95 ${isFormValid
-                ? 'bg-[#4669AF] hover:bg-[#36528A] hover:shadow-lg'
-                : 'bg-gray-400 cursor-not-allowed'
+              ? 'bg-[#4669AF] hover:bg-[#36528A] hover:shadow-lg'
+              : 'bg-gray-400 cursor-not-allowed'
               }`}
             disabled={!isFormValid}
             onClick={handleSubmit}
           >
-            Guardar
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <FiClock className="animate-spin" />
+                Procesando...
+              </span>
+            ) : onAddToQueue ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="text-xl font-bold">+</span>
+                Agregar solicitud a la cola
+              </span>
+            ) : (
+              'Guardar'
+            )}
           </button>
         </div>
       </div>

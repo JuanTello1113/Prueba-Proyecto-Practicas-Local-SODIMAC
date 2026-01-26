@@ -16,6 +16,7 @@ import Otros from '../pages/Solicitudes/Otros';
 import OtroSiDef from '../pages/Solicitudes/OtroSiDef';
 import OtroSiTemp from '../pages/Solicitudes/OtroSiTemp';
 import Vacaciones from '../pages/Solicitudes/Vacaciones';
+import SolicitudesRapidas from '../pages/Solicitudes/SolicitudesRapidas';
 import Error403FORBBIDEN from '../pages/Unauthorized/Error403';
 import NotificacionesAdmin from '../pages/Users/Notificaciones';
 import GestionUser from '../pages/Users/UsersGestion';
@@ -72,6 +73,7 @@ const AppRoutes = () => {
         <Route path="/solicitud-OtroSiTemp" element={<OtroSiTemp />} />
         <Route path="/solicitud-vacaciones" element={<Vacaciones />} />
         <Route path="/solicitud-otros" element={<Otros />} />
+        <Route path="/solicitudes-rapidas" element={<SolicitudesRapidas />} />
         <Route
           path="/vista-previa-individual-tienda/:id"
           element={<VistPrevTInd />}

@@ -8,26 +8,31 @@ import FormularioOtroSiTemporal from './FormOtroSiTemp';
 import FormularioVacaciones from './FormVacaciones';
 import FormularioOtroSiDef from './FromOtrSDef';
 
-const Individual: React.FC = () => {
+interface IndividualProps {
+  titulo?: string;
+  onAddToQueue?: (formData: { cedula: number; nombre: string; detalle: string }) => void;
+}
+
+const Individual: React.FC<IndividualProps> = ({ titulo: propsTitulo, onAddToQueue }) => {
   const { state } = useLocation();
-  const titulo = state?.titulo || '';
+  const titulo = propsTitulo || state?.titulo || '';
 
   const RenderForm = () => {
     switch (titulo) {
       case 'Auxilio de transporte':
-        return <FormularioAuxTransp />;
+        return <FormularioAuxTransp titulo={titulo} onAddToQueue={onAddToQueue} />;
       case 'Descuento':
-        return <FormularioDesc />;
+        return <FormularioDesc titulo={titulo} onAddToQueue={onAddToQueue} />;
       case 'Otro Si Definitivo':
-        return <FormularioOtroSiDef />;
+        return <FormularioOtroSiDef titulo={titulo} onAddToQueue={onAddToQueue} />;
       case 'Otros':
-        return <FormularioOtros />;
+        return <FormularioOtros titulo={titulo} onAddToQueue={onAddToQueue} />;
       case 'Vacaciones':
-        return <FormularioVacaciones />;
+        return <FormularioVacaciones titulo={titulo} onAddToQueue={onAddToQueue} />;
       case 'Otro Si Temporal':
-        return <FormularioOtroSiTemporal />;
+        return <FormularioOtroSiTemporal titulo={titulo} onAddToQueue={onAddToQueue} />;
       case 'Horas Extra':
-        return <FormularioHorasExtra />;
+        return <FormularioHorasExtra titulo={titulo} onAddToQueue={onAddToQueue} />;
     }
   };
 

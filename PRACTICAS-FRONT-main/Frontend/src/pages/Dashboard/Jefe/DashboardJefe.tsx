@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Layers } from 'lucide-react';
 import {
   FaBus,
   FaClock,
@@ -174,6 +174,14 @@ const DashboardJefe: React.FC = () => {
               color="bg-[#2C3333]"
               className="h-[100px] w-full rounded-xl"
               onClick={() => navigate('/notificaciones')}
+            />
+            <CardsTitle
+              title="Solicitudes Rápidas"
+              icon={<Layers size={35} />}
+              headerLabel="CREACIÓN MÚLTIPLE"
+              color="bg-[#4669AF]"
+              className="h-[100px] w-full rounded-xl"
+              onClick={() => navigate('/solicitudes-rapidas')}
             />
           </div>
 

@@ -8,7 +8,12 @@ import ErroresArchivoAlert from '../Alerts/ErroresArchivoAlert';
 import ExitoArchivoAlert from '../Alerts/ExitoArchivoAlert';
 import NumeroSolicitudesAlert from '../Alerts/NumeroSolicitudes';
 
-const Masivo: React.FC = () => {
+interface MasivoProps {
+  titulo?: string;
+  onAddToQueue?: (data: any) => void;
+}
+
+const Masivo: React.FC<MasivoProps> = ({ titulo: propsTitulo, onAddToQueue }) => {
   const authContext = useContext(AuthContext);
 
   if (!authContext) {
@@ -28,6 +33,7 @@ const Masivo: React.FC = () => {
   const [erroresArchivo, setErroresArchivo] = useState<string[] | null>(null);
   const navigate = useNavigate();
   const { state } = useLocation();
+  const titulo = propsTitulo || state?.titulo || '';
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
@@ -61,7 +67,6 @@ const Masivo: React.FC = () => {
     }
   };
 
-  const titulo = state?.titulo || 'Título por defecto';
   console.log('Título que llega desde el estado:', titulo);
 
   const descargarPlantilla = () => {
@@ -231,8 +236,8 @@ const Masivo: React.FC = () => {
             <label
               htmlFor="file-upload"
               className={`w-full px-4 py-2.5 rounded-lg cursor-pointer transition-all font-medium text-sm flex items-center justify-center gap-2 ${selectedFile
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-[#4669AF] text-white hover:bg-[#36528A]'
+                ? 'bg-green-600 text-white hover:bg-green-700'
+                : 'bg-[#4669AF] text-white hover:bg-[#36528A]'
                 }`}
             >
               {selectedFile ? '✅ Archivo Cargado' : '☁ Subir Excel'}
@@ -264,17 +269,37 @@ const Masivo: React.FC = () => {
             // Si hay archivo seleccionado pero no subido, validamos. Si ya subió (archivoSubido), solo mostramos exito?
             // La logica original usa un boton "Subir Archivo" dentro de la tarjeta 3 que dispara handleFileChange,
             // y un boton final que dispara subirArchivo (o handleUpload si existiera, aqui se llama subirArchivo).
-            subirArchivo
+            onAddToQueue && selectedFile
+              ? () => {
+                onAddToQueue({
+                  archivo: selectedFile,
+                  nombreArchivo: selectedFile.name
+                });
+                setSelectedFile(null);
+                setArchivoSubido({
+                  nombreArchivo: selectedFile.name,
+                  tituloNovedad: titulo,
+                  idCaso: 0 // No real ID yet
+                });
+                // Auto-clear success message after delay? Or let the parent handle it.
+                // For now, let's just clear the file so user can add another.
+              }
+              : subirArchivo
           }
           disabled={!selectedFile || isLoading}
           className={`px-8 py-2.5 rounded-lg text-white font-bold shadow-md transition-all transform active:scale-95 flex items-center justify-center gap-2 ${!selectedFile || isLoading
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-[#4669AF] hover:bg-[#36528A] hover:shadow-lg'
+            ? 'bg-gray-300 cursor-not-allowed'
+            : 'bg-[#4669AF] hover:bg-[#36528A] hover:shadow-lg'
             }`}
         >
           {isLoading ? (
             <>
               <FiClock className="animate-spin" /> Procesando...
+            </>
+          ) : onAddToQueue ? (
+            <>
+              <span className="text-xl font-bold">+</span>
+              Agregar solicitud a la cola
             </>
           ) : (
             'Procesar Solicitudes'

@@ -13,9 +13,17 @@ import ExitoArchivoAlert from '../Alerts/ExitoArchivoAlert';
 
 registerLocale('es', es);
 
-const FormularioVacaciones: React.FC = () => {
+interface FormularioVacacionesProps {
+  titulo?: string;
+  onAddToQueue?: (formData: any) => void;
+}
+
+const FormularioVacaciones: React.FC<FormularioVacacionesProps> = ({ titulo: propsTitulo, onAddToQueue }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const titulo = propsTitulo || location.state?.titulo || 'No disponible';
+
   const [cedula, setCedula] = useState('');
   const [nombre, setNombre] = useState('');
   const [dias, setDias] = useState('');
@@ -25,8 +33,6 @@ const FormularioVacaciones: React.FC = () => {
   ]);
   const [detalle, setDetalle] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
-  const location = useLocation();
-  const titulo = location.state?.titulo || 'No disponible';
 
   const [erroresArchivo, setErroresArchivo] = useState<string[] | null>(null);
   const [archivoSubido, setArchivoSubido] = useState<{
@@ -76,10 +82,6 @@ const FormularioVacaciones: React.FC = () => {
   });
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    setErroresArchivo(null);
-    setArchivoSubido(null);
-
     const [fecha_inicio, fecha_fin] = rangoFechas;
 
     const payload = {
@@ -95,6 +97,22 @@ const FormularioVacaciones: React.FC = () => {
       fecha_fin: fecha_fin?.toISOString(),
       dias: Number(dias),
     };
+
+    if (onAddToQueue) {
+      onAddToQueue(payload);
+      // Limpiar formulario
+      setCedula('');
+      setNombre('');
+      setDias('');
+      setRangoFechas([null, null]);
+      setDetalle('');
+      setIsFormValid(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setErroresArchivo(null);
+    setArchivoSubido(null);
 
     try {
       console.log('📤 Enviando payload:', payload);
@@ -246,15 +264,21 @@ const FormularioVacaciones: React.FC = () => {
 
         <div className="flex flex-col gap-2 py-8 items-end">
           <button
-            className={`w-full px-4 py-2 rounded-lg text-white ${
-              isFormValid
-                ? 'bg-[#4669AF] hover:opacity-90'
-                : 'bg-gray-400 cursor-not-allowed'
-            }`}
+            className={`w-full px-4 py-2 rounded-lg text-white ${isFormValid
+              ? 'bg-[#4669AF] hover:opacity-90'
+              : 'bg-gray-400 cursor-not-allowed'
+              }`}
             disabled={!isFormValid}
             onClick={handleSubmit}
           >
-            Guardar
+            {onAddToQueue ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="text-xl font-bold">+</span>
+                Agregar solicitud a la cola
+              </span>
+            ) : (
+              'Guardar'
+            )}
           </button>
           <button
             className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:opacity-90"

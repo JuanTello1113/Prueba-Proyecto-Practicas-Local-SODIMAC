@@ -160,13 +160,13 @@ def validar_otro_si_temporal(fila, row_idx, campos_obligatorios, errores):
     
     if not isinstance(fecha_inicio, datetime):
         errores.append(
-            f"❌ Fila {row_idx}, Columna {fecha_inicio_idx + 1} (FECHA INICIO): debe ser una fecha válida."
+            f"❌ Fila {row_idx}, Columna {fecha_inicio_idx + 1} (FECHA INICIO): debe ser una fecha válida. Valor recibido: '{fecha_inicio_val}'"
         )
         fila_valida = False
     
     if not isinstance(fecha_fin, datetime):
         errores.append(
-            f"❌ Fila {row_idx}, Columna {fecha_fin_idx + 1} (FECHA FIN): debe ser una fecha válida."
+            f"❌ Fila {row_idx}, Columna {fecha_fin_idx + 1} (FECHA FIN): debe ser una fecha válida. Valor recibido: '{fecha_fin_val}'"
         )
         fila_valida = False
     
@@ -326,12 +326,50 @@ def normalizar_fecha(fecha_raw):
     if isinstance(fecha_raw, datetime):
         return fecha_raw.replace(hour=5, minute=0, second=0, microsecond=0)
     elif isinstance(fecha_raw, str):
-        for fmt in ["%d/%m/%Y", "%Y-%m-%d", "%Y-%m-%d %H:%M:%S"]:
+        # Lista ampliada de formatos soportados
+        formatos = [
+            "%d/%m/%Y",       # 25/12/2025
+            "%Y-%m-%d",       # 2025-12-25
+            "%d-%m-%Y",       # 25-12-2025
+            "%d/%m/%y",       # 25/12/25
+            "%d-%m-%y",       # 25-12-25
+            "%Y/%m/%d",       # 2025/12/25
+            "%Y-%m-%d %H:%M:%S" # 2025-12-25 14:30:00
+        ]
+        
+        fecha_limpia = fecha_raw.strip()
+        # Reemplazar separadores comunes por guiones para unificar
+        fecha_limpia = fecha_limpia.replace('/', '-').replace('.', '-').replace('\\', '-')
+        
+        for fmt in formatos:
             try:
-                fecha = datetime.strptime(fecha_raw.strip(), fmt)
+                fecha = datetime.strptime(fecha_limpia, fmt)
+                # Si el año es de 2 dígitos y se interpreta en el pasado lejano o futuro lejano, 
+                # datetime lo maneja basado en pivot 2000 o similar, generalmente ok para este caso.
                 return fecha.replace(hour=5, minute=0, second=0, microsecond=0)
             except ValueError:
                 continue
+    
+    # Soporte para fechas numéricas de Excel (Serial Date)
+    # Ej: 45915 -> 2025-09-16
+    elif isinstance(fecha_raw, (int, float)):
+        try:
+            val = float(fecha_raw)
+            # Solo procesar números razonables para fechas (ej: > 1000) para evitar falsos positivos con otros números
+            if val > 1000:
+                return openpyxl.utils.datetime.from_excel(val).replace(hour=5, minute=0, second=0, microsecond=0)
+        except Exception:
+            pass
+    
+    # Soporte para cadenas que son números (Excel date como string)
+    elif isinstance(fecha_raw, str) and fecha_raw.replace('.', '', 1).isdigit():
+        try:
+             val = float(fecha_raw)
+             if val > 1000:
+                 return openpyxl.utils.datetime.from_excel(val).replace(hour=5, minute=0, second=0, microsecond=0)
+        except Exception:
+            pass
+
     return None
 
 

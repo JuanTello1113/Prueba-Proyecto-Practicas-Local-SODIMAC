@@ -13,11 +13,16 @@ import ExitoArchivoAlert from '../Alerts/ExitoArchivoAlert';
 
 registerLocale('es', es);
 
-const FormularioOtroSiTemporal: React.FC = () => {
+interface FormularioOtroSiTemporalProps {
+  titulo?: string;
+  onAddToQueue?: (formData: any) => void;
+}
+
+const FormularioOtroSiTemporal: React.FC<FormularioOtroSiTemporalProps> = ({ titulo: propsTitulo, onAddToQueue }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const titulo = location.state?.titulo || 'No disponible';
+  const titulo = propsTitulo || location.state?.titulo || 'No disponible';
 
   const [cedula, setCedula] = useState('');
   const [nombre, setNombre] = useState('');
@@ -98,10 +103,6 @@ const FormularioOtroSiTemporal: React.FC = () => {
   });
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    setErroresArchivo(null);
-    setArchivoSubido(null);
-
     const [fecha_inicio, fecha_fin] = rangoFechas;
 
     const payload = {
@@ -122,6 +123,27 @@ const FormularioOtroSiTemporal: React.FC = () => {
       jefe: user?.nombre ?? '',
       fecha: new Date(new Date().setHours(5, 0, 0, 0)).toISOString(), // 👈 igual que masivos
     };
+
+    if (onAddToQueue) {
+      onAddToQueue(payload);
+      // Limpiar formulario
+      setCedula('');
+      setNombre('');
+      setFechaNovedad(null);
+      setJornadaActual('');
+      setNuevaJornada('');
+      setRangoFechas([null, null]);
+      setSalarioActual('');
+      setNuevoSalario('');
+      setConsecutivo('');
+      setDetalle('');
+      setIsFormValid(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setErroresArchivo(null);
+    setArchivoSubido(null);
 
     try {
       console.log('📤 Enviando payload:', payload);
@@ -353,7 +375,14 @@ const FormularioOtroSiTemporal: React.FC = () => {
             disabled={!isFormValid}
             onClick={handleSubmit}
           >
-            Guardar
+            {onAddToQueue ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="text-xl font-bold">+</span>
+                Agregar solicitud a la cola
+              </span>
+            ) : (
+              'Guardar'
+            )}
           </button>
           <button
             className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:opacity-90"

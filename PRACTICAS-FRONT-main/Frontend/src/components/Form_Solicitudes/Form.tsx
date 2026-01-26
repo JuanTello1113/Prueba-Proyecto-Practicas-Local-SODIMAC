@@ -26,11 +26,22 @@ const iconMap = {
 // claves del iconMap
 type IconKey = keyof typeof iconMap;
 
-const FormSolicitudes: React.FC = () => {
+interface FormSolicitudesProps {
+  titulo?: string;
+  iconName?: string;
+  onAddToQueue?: (data: any) => void;
+}
+
+const FormSolicitudes: React.FC<FormSolicitudesProps> = ({
+  titulo: propsTitle,
+  iconName: propsIconName,
+  onAddToQueue
+}) => {
   const { state } = useLocation();
 
-  const titulo = state?.titulo || 'Título por defecto';
-  const iconName = state?.iconName;
+  // Use props if provided, otherwise fall back to location state
+  const titulo = propsTitle || state?.titulo || 'Título por defecto';
+  const iconName = propsIconName || state?.iconName;
   const icon =
     iconName && iconName in iconMap ? (
       iconMap[iconName as IconKey]
@@ -49,7 +60,7 @@ const FormSolicitudes: React.FC = () => {
 
   return (
     <section
-      className={`bg-white px-8 rounded-lg w-full max-w-5xl mx-auto relative shadow-[2px_8px_12px_rgba(0,0,0,0.8)] ${hoverShadow} transform hover:scale-105 transition-all duration-300 ease-in-out hover:-translate-y-2`}
+      className={`bg-white text-gray-800 px-8 rounded-lg w-full max-w-5xl mx-auto relative shadow-[2px_8px_12px_rgba(0,0,0,0.8)] ${hoverShadow} transform hover:scale-105 transition-all duration-300 ease-in-out hover:-translate-y-2`}
     >
       {/* TITULO */}
       <div className="text-black flex items-center gap-2 mb-2 justify-center">
@@ -99,7 +110,7 @@ const FormSolicitudes: React.FC = () => {
       </div>
 
       {/* FORMULARIOS DINAMICOS */}
-      {modoMasivo ? <Masivo /> : <Individual />}
+      {modoMasivo ? <Masivo titulo={titulo} onAddToQueue={onAddToQueue} /> : <Individual titulo={titulo} onAddToQueue={onAddToQueue} />}
     </section>
   );
 };
