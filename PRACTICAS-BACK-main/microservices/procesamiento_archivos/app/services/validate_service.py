@@ -275,8 +275,8 @@ def validar_vacaciones(fila, row_idx, campos_obligatorios, errores):
     fila_valida = True
 
     dias_tomar_idx = campos_obligatorios.get("DIAS A TOMAR")
-    fecha_inicio_disfrute_idx = campos_obligatorios.get("FECHA INICIO DISFRUTE")
-    fecha_fin_disfrute_idx = campos_obligatorios.get("FECHA FIN DISFRUTE")
+    fecha_inicio_disfrute_idx = campos_obligatorios.get("FECHA INICIO")
+    fecha_fin_disfrute_idx = campos_obligatorios.get("FECHA FIN")
 
     if dias_tomar_idx is None or fecha_inicio_disfrute_idx is None or fecha_fin_disfrute_idx is None:
         errores.append(f"❌ Fila {row_idx}: Faltan columnas requeridas para vacaciones.")
@@ -506,34 +506,54 @@ async def validar_excel(
         
         # Si no hay coincidencia exacta, hacer matching fuzzy por palabra clave
         palabras_clave = {
-            "CEDULA": ["CEDULA", "CC", "IDENTIFICACION"],
-            "NOMBRE (APELLIDOS-NOMBRES)": ["NOMBRE", "APELLIDOS"],
-            "DETALLE NOVEDAD": ["DETALLE", "NOVEDAD"],
+            "CEDULA": ["CEDULA", "CC", "IDENTIFICACION", "DOCUMENTO"],
+            "NOMBRE (APELLIDOS-NOMBRES)": ["NOMBRE", "APELLIDOS", "EMPLEADO", "COLABORADOR"],
+            "DETALLE NOVEDAD": ["DETALLE", "NOVEDAD", "OBSERVACION", "DESCRIPCION"],
             "CONCEPTO": ["CONCEPTO"],
-            "CON_CODIGO": ["CODIGO", "CON_CODIGO"],
-            "UNIDADES": ["UNIDADES", "CANTIDAD"],
-            "FECHA NOVEDAD": ["FECHA NOVEDAD", "FECHA_NOVEDAD"],
-            "JORNADA EMPLEADO": ["JORNADA EMPLEADO", "JORNADA_EMPLEADO"],
-            "JORNADA OTRO SI TEMPORAL": ["JORNADA OTRO SI", "JORNADA_OTRO_SI"],
-            "FECHA INICIO": ["FECHA INICIO", "FECHA_INICIO"],
-            "FECHA FIN": ["FECHA FIN", "FECHA_FIN"],
-            "SALARIO ACTUAL": ["SALARIO ACTUAL", "SALARIO_ACTUAL"],
-            "SALARIO OTRO SI TEMPORAL": ["SALARIO OTRO SI", "SALARIO_OTRO_SI"],
-            "CONSECUTIVO FORMS": ["CONSECUTIVO", "FORMS"],
-            "DIAS A TOMAR": ["DIAS", "TOMAR"],
+            "CON_CODIGO": ["CODIGO", "CON_CODIGO", "ID_CONCEPTO"],
+            "UNIDADES": ["UNIDADES", "CANTIDAD", "HORAS"],
+            "FECHA NOVEDAD": ["FECHA NOVEDAD", "FECHA_NOVEDAD", "DIA NOVEDAD"],
+            "JORNADA EMPLEADO": ["JORNADA EMPLEADO", "JORNADA", "TURNO"],
+            "JORNADA OTRO SI TEMPORAL": ["JORNADA OTRO SI", "NUEVA JORNADA", "CAMBIO TURNO"],
+            "FECHA INICIO": ["FECHA INICIO", "INICIO", "DESDE", "F. INICIO"],
+            "FECHA FIN": ["FECHA FIN", "FIN", "HASTA", "F. FIN", "TERMINACION"],
+            "SALARIO ACTUAL": ["SALARIO ACTUAL", "SUELDO", "BASICO"],
+            "SALARIO OTRO SI TEMPORAL": ["SALARIO OTRO SI", "NUEVO SALARIO", "NUEVO SUELDO"],
+            "CONSECUTIVO FORMS": ["CONSECUTIVO", "FORMS", "OT"],
+            "DIAS A TOMAR": ["DIAS", "TOMAR", "CANTIDAD DIAS", "NUMERO DIAS"],
         }
+        
+        print("🔍 [DEBUG] Buscando columnas obligatorias...")
+        print(f"🔍 [DEBUG] Headers normalizados: {encabezados_normalizados}")
         
         # Buscar por palabra clave
         encontrado = False
-        for idx, header in enumerate(encabezados_normalizados):
-            if campo_esperado in palabras_clave:
+        for campo_esperado in campos_esperados_map:
+             print(f"🔍 [DEBUG] Buscando campo: {campo_esperado}")
+             encontrado_campo = False
+             
+             # 1. Búsqueda exacta
+             campo_upper = campo_esperado.upper()
+             if campo_upper in encabezados_normalizados:
+                 campos_obligatorios[campo_esperado] = encabezados_normalizados.index(campo_upper)
+                 print(f"✅ [DEBUG] Encontrado EXACTO: {campo_esperado} en índice {campos_obligatorios[campo_esperado]}")
+                 continue
+
+             # 2. Búsqueda por palabras clave
+             if campo_esperado in palabras_clave:
                 for keyword in palabras_clave[campo_esperado]:
-                    if keyword in header:
-                        campos_obligatorios[campo_esperado] = idx
-                        encontrado = True
+                    keyword_normalized = keyword.upper()
+                    for idx, header in enumerate(encabezados_normalizados):
+                        if keyword_normalized in header:
+                            campos_obligatorios[campo_esperado] = idx
+                            print(f"✅ [DEBUG] Encontrado por KEYWORD '{keyword}': {campo_esperado} en índice {idx} (Header: '{header}')")
+                            encontrado_campo = True
+                            break
+                    if encontrado_campo:
                         break
-            if encontrado:
-                break
+             
+             if not encontrado_campo and campo_esperado not in campos_obligatorios:
+                 print(f"❌ [DEBUG] NO ENCONTRADO: {campo_esperado}")
     
     # Validar que encontramos todas las columnas necesarias
     faltantes = [f for f in campos_esperados_map if f not in campos_obligatorios]
